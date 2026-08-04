@@ -81,6 +81,7 @@
   <div class="subtitle">新增單字、更換圖片、錄製聲音（存在這台裝置）</div>
   <div style="text-align:center;margin-bottom:12px">
     <button class="small-btn" id="reportBtn">📊 學習報告</button>
+    <button class="small-btn" id="overviewBtn" style="background:#845ec2;box-shadow:0 5px 0 #5d3f8f">🗂 資料總覽</button>
   </div>
   <div id="parentReport" style="display:none"></div>
   <div id="parentThemes"></div>
@@ -142,6 +143,14 @@
 
 <!-- 例句字幕 -->
 <div id="sentenceBox"><div class="sen-en"></div><div class="sen-zh"></div></div>
+
+<!-- 資料總覽（家長） -->
+<div class="screen" id="screen-overview">
+  <h1>🗂 資料總覽</h1>
+  <div class="subtitle">全部教材內容一覽（點喇叭試聽）</div>
+  <div id="ovSummary"></div>
+  <div id="ovList"></div>
+</div>
 
 <!-- PIN 碼閘門 -->
 <div id="pinGate">

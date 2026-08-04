@@ -7,8 +7,8 @@
    ===================================================== */
 const Cloud = (() => {
   const CFG = {
-    projectId: '',   // ← Firebase 專案 ID（開通後填入）
-    apiKey: '',      // ← Firebase Web API Key（公開性質的金鑰，可放前端）
+    projectId: 'kids-english-fd798',
+    apiKey: 'AIzaSyD59y9uI5eqSpNjLJopY_nT7O02jhrgpuE',   // Firebase Web Key（公開性質，安全性由資料庫規則把關）
   };
   const CHUNK = 800000;   // 每片約 0.8MB，留餘裕給 Firestore 1MB 上限
 

@@ -221,6 +221,29 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 .rp-chip.good { background: #d9ffe5; color: #1a7a3a; }
 .rp-chip.bad { background: #ffe0e0; color: #b03030; }
 
+/* ===== 資料總覽 ===== */
+#screen-overview { align-items: stretch; }
+#ovSummary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.ov-stat { background: #fff; border-radius: 12px; padding: 10px 16px; text-align: center; flex: 1; min-width: 100px; }
+.ov-stat .num { font-size: 1.4rem; font-weight: bold; color: #845ec2; }
+.ov-stat .lab { font-size: .82rem; color: #888; }
+.ov-theme-head { font-size: 1.15rem; font-weight: bold; color: #444; margin: 14px 0 6px; }
+.ov-row { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 12px;
+  padding: 6px 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.ov-row img.ov-thumb, .ov-row span.ov-thumb { width: 44px; height: 44px; object-fit: contain;
+  font-size: 2rem; line-height: 44px; text-align: center; flex-shrink: 0; }
+.ov-main { flex: 1; min-width: 150px; }
+.ov-en { font-weight: bold; }
+.ov-zh { color: #888; font-size: .88rem; }
+.ov-sen { color: #666; font-size: .85rem; }
+.ov-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+.ov-badge { font-size: .72rem; padding: 2px 7px; border-radius: 6px; background: #eef; color: #557; }
+.ov-badge.c { background: #ffe9a8; color: #7a5c00; }
+.ov-badge.m { background: #d9ffe5; color: #1a7a3a; }
+.ov-badge.x { background: #ffe0e0; color: #b03030; }
+.ov-play { font-size: 1.1rem; padding: 6px 10px; border-radius: 8px; border: 2px solid #4ecdc4;
+  background: #fff; cursor: pointer; }
+
 /* ===== 家長模式 ===== */
 #screen-parent { align-items: stretch; }
 #parentThemes { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }

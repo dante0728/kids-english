@@ -337,6 +337,7 @@ function showScreen(name) {
 $('homeBtn').onclick = () => { stopSpeech(); stopRecognition(); showScreen('menu'); };
 $('backBtn').onclick = () => {
   stopSpeech(); stopRecognition();
+  if (currentScreen === 'overview') { showScreen('parent'); return; }
   showScreen(['mode', 'parent', 'shop'].includes(currentScreen) ? 'menu' : 'mode');
 };
 $('parentBtn').onclick = () => {
@@ -884,6 +885,76 @@ function renderReport() {
     </div>
     ${themeHtml || '<div style="color:#999">還沒有學習紀錄，玩過「聽聽看」或「打怪獸」就會開始記錄囉！</div>'}
     <div style="color:#999;font-size:.85rem;margin-top:10px">✓ 已掌握（答對 3 次以上）　✗ 常錯（建議多練）；「聽聽看」和「打怪獸」會自動優先出還沒學和常錯的字。</div>`;
+}
+
+// 資料總覽：全部教材內容一頁看完
+$('overviewBtn').onclick = () => { showScreen('overview'); renderOverview(); };
+function renderOverview() {
+  // 統計
+  let total = 0, customCount = 0, editedCount = 0, recCount = 0;
+  THEMES.forEach(t => {
+    allWords(t).forEach((w, i) => {
+      total++;
+      if (w._custom) customCount++;
+      const ov = Custom.data.over[t.id + '_' + i];
+      if (ov && (ov.sen !== undefined || ov.szh !== undefined || ov.img)) editedCount++;
+      if ((ov && (ov.aw || ov.as)) || (w._custom && (w.aw || w.as))) recCount++;
+    });
+  });
+  const usedKB = Math.round(['abc-custom', 'abc-mem', 'abc-heroes', 'abc-days']
+    .reduce((s, k) => s + (localStorage.getItem(k) || '').length, 0) / 1024);
+  $('ovSummary').innerHTML = `
+    <div class="ov-stat"><div class="num">${total}</div><div class="lab">單字總數</div></div>
+    <div class="ov-stat"><div class="num">${customCount}</div><div class="lab">自訂單字</div></div>
+    <div class="ov-stat"><div class="num">${editedCount}</div><div class="lab">改過的內建字</div></div>
+    <div class="ov-stat"><div class="num">${recCount}</div><div class="lab">有自訂聲音</div></div>
+    <div class="ov-stat"><div class="num">${usedKB}<span style="font-size:.8rem">KB</span></div><div class="lab">本機用量(約5MB可用)</div></div>
+    <div class="ov-stat"><div class="num">${Cloud.enabled() && Cloud.getCode() ? '☁️✓' : '—'}</div><div class="lab">雲端同步</div></div>`;
+  // 全部單字列表
+  const list = $('ovList');
+  list.innerHTML = '';
+  THEMES.forEach(t => {
+    const head = document.createElement('div');
+    head.className = 'ov-theme-head';
+    head.textContent = `${t.emoji} ${t.name}（${allWords(t).length} 個）`;
+    list.appendChild(head);
+    allWords(t).forEach((w, i) => {
+      const ov = Custom.data.over[t.id + '_' + i];
+      const m = Mem.data[Mem.key(t, i)];
+      const src = imgSrcFor(t, i);
+      const badges = [];
+      if (w._custom) badges.push('<span class="ov-badge c">自訂</span>');
+      if (ov && ov.img) badges.push('<span class="ov-badge">換過圖</span>');
+      if (ov && (ov.sen !== undefined || ov.szh !== undefined)) badges.push('<span class="ov-badge">例句已改</span>');
+      if ((ov && ov.aw) || (w._custom && w.aw)) badges.push('<span class="ov-badge">自訂單字音</span>');
+      if ((ov && ov.as) || (w._custom && w.as)) badges.push('<span class="ov-badge">自訂例句音</span>');
+      if (m) {
+        if (m.ok >= 3 && m.ok > m.ng) badges.push('<span class="ov-badge m">已掌握</span>');
+        else if (m.ng >= 2 && m.ng >= m.ok) badges.push(`<span class="ov-badge x">常錯 ${m.ng}次</span>`);
+        else badges.push(`<span class="ov-badge">練習中 ✓${m.ok} ✗${m.ng}</span>`);
+      }
+      const row = document.createElement('div');
+      row.className = 'ov-row';
+      row.innerHTML = `
+        ${src ? `<img class="ov-thumb" src="${src}" loading="lazy" onerror="this.outerHTML='<span class=ov-thumb>${w.emoji || '⭐'}</span>'">`
+              : `<span class="ov-thumb">${w.emoji || '⭐'}</span>`}
+        <div class="ov-main">
+          <span class="ov-en">${w.en}</span> <span class="ov-zh">${w.zh}</span>
+          <div class="ov-sen">${w.sen || ''}${w.szh ? '｜' + w.szh : ''}</div>
+          <div class="ov-badges">${badges.join('')}</div>
+        </div>
+        <button class="ov-play" data-k="w">🔊</button>
+        <button class="ov-play" data-k="s">💬</button>`;
+      row.querySelectorAll('.ov-play').forEach(b => {
+        b.onclick = () => {
+          stopSpeech(); chainId++;
+          if (b.dataset.k === 'w') playWordAudio(t, i, null);
+          else playSentenceAudio(t, i, null);
+        };
+      });
+      list.appendChild(row);
+    });
+  });
 }
 
 // 匯出 / 匯入備份
