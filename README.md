@@ -17,20 +17,29 @@ css/style.css       樣式（含 RWD）
 js/words.js         單字庫（要加單字改這裡）
 js/audio.js         音效引擎（優先播 mp3，失敗時即時合成備援）
 js/app.js           遊戲邏輯
-assets/sfx/         43 個音效 mp3
-assets/voice/       204 個語音 mp3（單字＋例句）
+assets/sfx/         43 個真實音效 mp3（含 credits.json 來源）
+assets/voice/       204 個 Edge TTS 神經網路語音 mp3（單字＋例句）
+assets/img/         80 張 CC0 真實照片縮圖（含 credits.json 來源）
 assets/bgm.wav      背景音樂（wav 才能無縫循環）
-tools/              素材重新產生腳本（Windows）
+tools/              素材產生腳本
 ```
+
+## 素材來源與授權
+- **語音**：Edge TTS 神經網路語音（en-US-JennyNeural / zh-TW-HsiaoChenNeural / 讚美語 en-US-AnaNeural）
+- **音效**：Google Actions 音效庫（royalty-free）＋ Openverse CC0 音效，來源見 `assets/sfx/credits.json`
+- **照片**：Openverse CC0（免版權）照片，來源見 `assets/img/credits.json`
+- **超級英雄關**：角色圖像有版權，縮圖維持 emoji
 
 ## 重新產生素材（改了單字之後）
 ```
-python tools/gen_sfx.py
-node tools/export_words.cjs
-powershell tools/gen_voice.ps1
-再用 ffmpeg 把 wav 轉 mp3（見部署歷史）
+node tools/export_words.cjs      # 匯出單字資料
+python tools/gen_voice_edge.py   # Edge TTS 語音（需網路）
+python tools/fetch_sfx.py        # 真實音效下載
+python tools/fetch_img.py        # CC0 照片下載
+python tools/gen_sfx.py          # （備援）離線合成音效
 ```
+語音合成後要把例句合併：`ffmpeg concat`（見 git 歷史），或直接請 Claude 代跑。
 
 ## 已知限制
 - 「跟著唸」的語音辨識只支援桌機/Android 的 Chrome、Edge；iPad Safari 會自動改成家長按「我唸對了」給獎勵
-- 語音是 Windows TTS 合成，之後可換成真人錄音（同檔名放進 assets/voice 即可）
+- 縮圖是自動搜尋的 CC0 照片，個別可能不夠貼切，可手動換掉 `assets/img/{主題}_{編號}.jpg`

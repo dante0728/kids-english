@@ -92,6 +92,15 @@ function playWordSequence(theme, i, onDone) {
   }, Math.max(dur * 1000, 300) + 150);
 }
 
+/* ================= 單字圖示（照片優先、emoji 備援） ================= */
+// 英雄關沒有照片（官方角色圖有版權），直接用 emoji
+function visualHTML(theme, i) {
+  const w = theme.words[i];
+  if (theme.id === 'heroes') return `<span class="emoji">${w.emoji}</span>`;
+  return `<span class="pic"><img src="assets/img/${theme.id}_${i}.jpg" alt="${w.en}" loading="lazy"
+            onerror="this.parentElement.classList.add('noimg')"><span class="emoji">${w.emoji}</span></span>`;
+}
+
 /* ================= 例句字幕 ================= */
 function showSentence(en, zh) {
   const box = $('sentenceBox');
@@ -181,7 +190,7 @@ function startCardsGame() {
     const c = document.createElement('div');
     c.className = 'word-card';
     c.style.setProperty('--c', currentTheme.color);
-    c.innerHTML = `<span class="emoji">${w.emoji}</span><div class="en">${w.en}</div><div class="zh">${w.zh}</div>`;
+    c.innerHTML = `${visualHTML(currentTheme, i)}<div class="en">${w.en}</div><div class="zh">${w.zh}</div>`;
     c.onclick = () => {
       document.querySelectorAll('.word-card').forEach(x => x.classList.remove('speaking'));
       c.classList.add('speaking');
@@ -212,7 +221,7 @@ function startListenGame() {
     const w = currentTheme.words[i];
     const d = document.createElement('div');
     d.className = 'choice';
-    d.textContent = w.emoji;
+    d.innerHTML = visualHTML(currentTheme, i);
     d.onclick = (e) => {
       if (listenLock) return;
       if (i === listenAnswerIdx) {
@@ -279,7 +288,7 @@ function nextSpeakWord() {
   speakIdx = Math.floor(Math.random() * currentTheme.words.length);
   const w = currentTheme.words[speakIdx];
   $('speakTarget').innerHTML =
-    `<span class="emoji">${w.emoji}</span><div class="en">${w.en}</div><div class="zh">${w.zh}</div>`;
+    `${visualHTML(currentTheme, speakIdx)}<div class="en">${w.en}</div><div class="zh">${w.zh}</div>`;
   speakResult.textContent = '';
   chainId++;
   playWordAudio(currentTheme, speakIdx, null);
