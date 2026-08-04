@@ -26,17 +26,18 @@ tools/              素材產生腳本
 
 ## 素材來源與授權
 - **語音**：Edge TTS 神經網路語音（en-US-JennyNeural / zh-TW-HsiaoChenNeural / 讚美語 en-US-AnaNeural）
-- **音效**：Google Actions 音效庫（royalty-free）＋ Openverse CC0 音效，來源見 `assets/sfx/credits.json`
-- **照片**：Openverse CC0（免版權）照片，來源見 `assets/img/credits.json`
-- **超級英雄關**：角色圖像有版權，縮圖維持 emoji
+- **縮圖**：[OpenMoji](https://openmoji.org)（CC BY-SA 4.0）統一扁平卡通圖庫
+- **超級英雄縮圖**：本專案手繪原創卡通頭像（`tools/gen_hero_svg.py`），非官方素材
+- **音效**：本專案合成引擎產生（`tools/gen_sfx.py`），43 個音效同一套風格
+- 本專案僅供個人／家庭學習使用，非商業用途
 
 ## 重新產生素材（改了單字之後）
 ```
 node tools/export_words.cjs      # 匯出單字資料
 python tools/gen_voice_edge.py   # Edge TTS 語音（需網路）
-python tools/fetch_sfx.py        # 真實音效下載
-python tools/fetch_img.py        # CC0 照片下載
-python tools/gen_sfx.py          # （備援）離線合成音效
+python tools/fetch_openmoji.py   # OpenMoji 卡通縮圖
+python tools/gen_hero_svg.py     # 英雄卡通頭像
+python tools/gen_sfx.py          # 合成音效（wav，再用 ffmpeg 轉 mp3）
 ```
 語音合成後要把例句合併：`ffmpeg concat`（見 git 歷史），或直接請 Claude 代跑。
 

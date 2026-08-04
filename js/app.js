@@ -92,12 +92,12 @@ function playWordSequence(theme, i, onDone) {
   }, Math.max(dur * 1000, 300) + 150);
 }
 
-/* ================= 單字圖示（照片優先、emoji 備援） ================= */
-// 英雄關沒有照片（官方角色圖有版權），直接用 emoji
+/* ================= 單字圖示（統一卡通圖庫、emoji 備援） ================= */
+// 一般主題：OpenMoji 卡通圖（png）；英雄主題：手繪卡通頭像（svg）
 function visualHTML(theme, i) {
   const w = theme.words[i];
-  if (theme.id === 'heroes') return `<span class="emoji">${w.emoji}</span>`;
-  return `<span class="pic"><img src="assets/img/${theme.id}_${i}.jpg" alt="${w.en}" loading="lazy"
+  const ext = theme.id === 'heroes' ? 'svg' : 'png';
+  return `<span class="pic"><img src="assets/img/${theme.id}_${i}.${ext}" alt="${w.en}" loading="lazy"
             onerror="this.parentElement.classList.add('noimg')"><span class="emoji">${w.emoji}</span></span>`;
 }
 

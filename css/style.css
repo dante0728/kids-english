@@ -138,10 +138,9 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 .confetti-piece { position: absolute; font-size: 1.8rem; animation: fall 1.6s linear forwards; }
 @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 
-/* ===== 真實照片縮圖（載入失敗自動退回 emoji） ===== */
+/* ===== 卡通縮圖（載入失敗自動退回 emoji） ===== */
 .pic { display: inline-block; line-height: 0; }
-.pic img { object-fit: cover; border-radius: 16px; border: 3px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+.pic img { object-fit: contain; }   /* 卡通圖去背，不需裁切邊框 */
 .pic .emoji { display: none; }
 .pic.noimg img { display: none; }
 .pic.noimg .emoji { display: inline; line-height: 1.2; }
