@@ -1,0 +1,181 @@
+/* ===== 基礎 ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+html, body { height: 100%; }
+body { min-height: 100dvh; }
+#topLeft { display: flex; gap: 10px; }
+body {
+  font-family: "Comic Sans MS", "Microsoft JhengHei", "微軟正黑體", "PingFang TC", sans-serif;
+  background: linear-gradient(160deg, #aee9ff 0%, #fdf6b2 60%, #ffd6e8 100%);
+  display: flex; flex-direction: column; align-items: center;
+  overflow: hidden; user-select: none; -webkit-user-select: none;
+}
+
+/* ===== 頂部列 ===== */
+#topbar {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 18px; gap: 10px;
+}
+.round-btn {
+  font-size: 1.6rem; background: #fff; border: 4px solid #ffb703;
+  border-radius: 50%; width: 60px; height: 60px; cursor: pointer;
+  box-shadow: 0 4px 0 #e09600; transition: transform .1s;
+}
+.round-btn:active { transform: translateY(3px); box-shadow: none; }
+.round-btn.off { filter: grayscale(1); opacity: .55; }
+#topRight { display: flex; align-items: center; gap: 10px; }
+#stars {
+  font-size: 1.5rem; background: #fff; border-radius: 999px;
+  padding: 8px 20px; border: 4px solid #ffb703; box-shadow: 0 4px 0 #e09600;
+  min-width: 100px; text-align: center;
+}
+
+/* ===== 畫面切換 ===== */
+.screen { display: none; flex: 1; width: 100%; max-width: 960px;
+  flex-direction: column; align-items: center; padding: 4px 16px 30px;
+  overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.screen.active { display: flex; }
+
+h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
+  text-shadow: 3px 3px 0 #fff; margin-bottom: 4px; text-align: center; }
+.subtitle { font-size: 1.15rem; color: #555; margin-bottom: 18px; text-align: center; }
+
+/* ===== 主題選單 ===== */
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px; width: 100%; }
+.menu-card {
+  background: #fff; border-radius: 28px; padding: 26px 14px;
+  text-align: center; cursor: pointer; border: 5px solid var(--c, #4ecdc4);
+  box-shadow: 0 8px 0 rgba(0,0,0,.12); transition: transform .12s;
+}
+.menu-card:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.12); }
+.menu-card .emoji { font-size: 3.8rem; display: block; margin-bottom: 8px; }
+.menu-card .name { font-size: 1.4rem; font-weight: bold; color: #333; }
+.menu-card .count { font-size: .95rem; color: #999; margin-top: 4px; }
+
+/* ===== 模式選單 ===== */
+.mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px; width: 100%; max-width: 720px; }
+
+/* ===== 單字卡 ===== */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px; width: 100%; padding-bottom: 20px; }
+.word-card {
+  background: #fff; border-radius: 22px; padding: 16px 6px; text-align: center;
+  cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,.12); transition: transform .12s;
+  border: 4px solid var(--c, #4ecdc4);
+}
+.word-card:active { transform: scale(.95); }
+.word-card.speaking { animation: bounce .5s infinite alternate; border-color: #ff6b6b; }
+.word-card .emoji { font-size: 3rem; display: block; }
+.word-card .en { font-size: 1.25rem; font-weight: bold; color: #333; margin-top: 5px; }
+.word-card .zh { font-size: .95rem; color: #888; }
+@keyframes bounce { from { transform: translateY(0) } to { transform: translateY(-9px) } }
+
+/* 例句顯示區 */
+#sentenceBox {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+  background: #fff; border: 4px solid #ffb703; border-radius: 20px;
+  padding: 12px 22px; max-width: 90vw; text-align: center;
+  box-shadow: 0 6px 0 rgba(0,0,0,.15); z-index: 50;
+  display: none;
+}
+#sentenceBox.show { display: block; animation: slideUp .25s; }
+#sentenceBox .sen-en { font-size: 1.3rem; font-weight: bold; color: #333; }
+#sentenceBox .sen-zh { font-size: 1.1rem; color: #777; margin-top: 2px; }
+@keyframes slideUp { from { transform: translate(-50%, 30px); opacity: 0 } to { transform: translate(-50%, 0); opacity: 1 } }
+
+/* ===== 聽力遊戲 ===== */
+#bigSpeaker {
+  font-size: 4.5rem; background: #fff; border: 6px solid #ffb703; border-radius: 50%;
+  width: 130px; height: 130px; cursor: pointer; box-shadow: 0 8px 0 #e09600;
+  margin: 6px 0 22px; transition: transform .1s;
+}
+#bigSpeaker:active { transform: translateY(4px); box-shadow: 0 3px 0 #e09600; }
+#listenProgress { font-size: 1.3rem; margin-bottom: 8px; letter-spacing: 4px; }
+.choice-grid { display: grid; grid-template-columns: repeat(2, minmax(120px, 190px));
+  gap: 18px; justify-content: center; }
+.choice {
+  background: #fff; border-radius: 24px; padding: 20px; text-align: center;
+  font-size: 4rem; cursor: pointer; border: 5px solid #ddd;
+  box-shadow: 0 6px 0 rgba(0,0,0,.12); transition: transform .12s;
+}
+.choice:active { transform: scale(.95); }
+.choice.correct { border-color: #2ecc71; background: #d9ffe5; animation: pop .4s; }
+.choice.wrong { border-color: #e74c3c; background: #ffe0e0; animation: shake .4s; }
+@keyframes pop { 50% { transform: scale(1.15) } }
+@keyframes shake { 25% { transform: translateX(-8px) } 75% { transform: translateX(8px) } }
+
+/* ===== 跟著唸 ===== */
+#speakTarget { text-align: center; margin-bottom: 16px; }
+#speakTarget .emoji { font-size: 5.2rem; display: block; }
+#speakTarget .en { font-size: 2.3rem; font-weight: bold; color: #333; }
+#speakTarget .zh { font-size: 1.2rem; color: #888; }
+#micBtn {
+  font-size: 2.8rem; background: #ff6b9d; border: none; border-radius: 50%;
+  width: 104px; height: 104px; cursor: pointer; box-shadow: 0 8px 0 #d14b7d;
+  transition: transform .1s; color: #fff;
+}
+#micBtn:active { transform: translateY(4px); box-shadow: 0 3px 0 #d14b7d; }
+#micBtn.listening { animation: pulse 1s infinite; background: #e74c3c; }
+@keyframes pulse { 50% { transform: scale(1.12) } }
+#speakResult { font-size: 1.5rem; margin-top: 16px; min-height: 2rem; text-align: center; color: #333; }
+.small-btn {
+  margin-top: 14px; font-size: 1.15rem; padding: 12px 26px; border-radius: 999px;
+  border: none; background: #4ecdc4; color: #fff; cursor: pointer;
+  box-shadow: 0 5px 0 #35a8a0; font-family: inherit;
+}
+.small-btn:active { transform: translateY(3px); box-shadow: none; }
+.small-btn.pink { background: #ff6b9d; box-shadow: 0 5px 0 #d14b7d; }
+#noMicNote { font-size: 1rem; color: #a05252; margin-top: 12px; text-align: center; max-width: 440px; }
+
+/* ===== 星星飛出動畫 ===== */
+.fly-star { position: fixed; font-size: 2.4rem; pointer-events: none; z-index: 99;
+  animation: fly 0.9s ease-out forwards; }
+@keyframes fly { to { transform: translate(var(--dx), var(--dy)) scale(0.4); opacity: 0; } }
+
+/* ===== 慶祝 ===== */
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 98; overflow: hidden; }
+.confetti-piece { position: absolute; font-size: 1.8rem; animation: fall 1.6s linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+/* ===== RWD ===== */
+/* 手機直式 */
+@media (max-width: 480px) {
+  .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .menu-card { padding: 18px 8px; }
+  .menu-card .emoji { font-size: 3rem; }
+  .menu-card .name { font-size: 1.15rem; }
+  .card-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .word-card .emoji { font-size: 2.4rem; }
+  .word-card .en { font-size: 1.05rem; }
+  .choice-grid { width: 100%; max-width: 380px; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .choice { font-size: 3.2rem; padding: 16px; }
+  .round-btn { width: 50px; height: 50px; font-size: 1.3rem; }
+  #stars { font-size: 1.2rem; padding: 6px 14px; min-width: 80px; }
+  #bigSpeaker { width: 104px; height: 104px; font-size: 3.6rem; }
+  #sentenceBox .sen-en { font-size: 1.1rem; }
+  #sentenceBox .sen-zh { font-size: .95rem; }
+}
+/* iPad 橫式 / 桌機大螢幕 */
+@media (min-width: 1024px) {
+  .card-grid { grid-template-columns: repeat(5, 1fr); }
+  .choice-grid { grid-template-columns: repeat(4, minmax(140px, 190px)); }
+}
+/* 螢幕很矮（手機橫式）時縮小標題與間距 */
+@media (max-height: 480px) {
+  h1 { font-size: 1.4rem; margin-bottom: 2px; }
+  .subtitle { font-size: .95rem; margin-bottom: 8px; }
+  #bigSpeaker { width: 80px; height: 80px; font-size: 2.6rem; margin-bottom: 12px; }
+  #micBtn { width: 80px; height: 80px; font-size: 2.2rem; }
+  #speakTarget .emoji { font-size: 3.2rem; }
+  #speakTarget .en { font-size: 1.6rem; }
+}
+
+/* 過關大字 */
+#levelClear {
+  position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+  flex-direction: column; background: rgba(255,255,255,.85); z-index: 100; text-align: center;
+}
+#levelClear.show { display: flex; }
+#levelClear .big { font-size: clamp(3rem, 10vw, 6rem); animation: pop .6s; }
+#levelClear .msg { font-size: 1.6rem; color: #ff6b6b; font-weight: bold; margin: 10px 0 20px; }

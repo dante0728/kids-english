@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ABC 樂園 — 小朋友學英文</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="topbar">
+  <div id="topLeft">
+    <button class="round-btn" id="homeBtn">🏠</button>
+    <button class="round-btn" id="backBtn" style="display:none">↩️</button>
+  </div>
+  <div id="topRight">
+    <button class="round-btn" id="bgmBtn" title="背景音樂">🎵</button>
+    <div id="stars">⭐ <span id="starCount">0</span></div>
+  </div>
+</div>
+
+<!-- 主題選單 -->
+<div class="screen active" id="screen-menu">
+  <h1>🌈 ABC 樂園 🌈</h1>
+  <div class="subtitle">選一個主題開始冒險吧！</div>
+  <div class="menu-grid" id="themeGrid"></div>
+</div>
+
+<!-- 模式選單 -->
+<div class="screen" id="screen-mode">
+  <h1 id="modeTitle"></h1>
+  <div class="subtitle">要玩哪一種遊戲呢？</div>
+  <div class="mode-grid">
+    <div class="menu-card" style="--c:#4ecdc4" id="modeCards">
+      <span class="emoji">🃏</span><span class="name">點點聽單字</span>
+      <div class="count">點卡片聽單字和例句</div>
+    </div>
+    <div class="menu-card" style="--c:#ffb703" id="modeListen">
+      <span class="emoji">👂</span><span class="name">聽聽看找一找</span>
+      <div class="count">答對 5 題就過關！</div>
+    </div>
+    <div class="menu-card" style="--c:#ff6b9d" id="modeSpeak">
+      <span class="emoji">🎤</span><span class="name">跟著唸唸看</span>
+      <div class="count">大聲唸出英文</div>
+    </div>
+  </div>
+</div>
+
+<!-- 遊戲一：點點聽 -->
+<div class="screen" id="screen-cards">
+  <h1 id="cardsTitle">🃏 點點聽</h1>
+  <div class="subtitle">點卡片，聽單字和例句！</div>
+  <div class="card-grid" id="cardGrid"></div>
+</div>
+
+<!-- 遊戲二：聽力選圖 -->
+<div class="screen" id="screen-listen">
+  <h1>👂 聽聽看</h1>
+  <div class="subtitle">聽聲音，找出正確的圖！</div>
+  <div id="listenProgress"></div>
+  <button id="bigSpeaker">🔊</button>
+  <div class="choice-grid" id="choiceGrid"></div>
+</div>
+
+<!-- 遊戲三：跟著唸 -->
+<div class="screen" id="screen-speak">
+  <h1>🎤 跟著唸</h1>
+  <div class="subtitle">聽一次，然後大聲唸出來！</div>
+  <div id="speakTarget"></div>
+  <button id="micBtn">🎤</button>
+  <div id="speakResult"></div>
+  <div id="speakBtns">
+    <button class="small-btn" id="replayBtn">再聽一次 🔊</button>
+    <button class="small-btn pink" id="selfOkBtn" style="display:none">我唸對了 ✋</button>
+    <button class="small-btn" id="nextWordBtn">換一個 ▶</button>
+  </div>
+  <div id="noMicNote"></div>
+</div>
+
+<!-- 例句字幕 -->
+<div id="sentenceBox"><div class="sen-en"></div><div class="sen-zh"></div></div>
+
+<!-- 過關畫面 -->
+<div id="levelClear">
+  <div class="big">🏆🎉</div>
+  <div class="msg" id="clearMsg">過關了！你好棒！</div>
+  <button class="small-btn pink" id="clearNextBtn">繼續玩 ▶</button>
+</div>
+
+<div id="confetti"></div>
+
+<script src="js/words.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
