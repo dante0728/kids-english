@@ -56,7 +56,7 @@ if (sessionStorage.getItem('abc-pin') !== 'ok') {
 const Custom = {
   data: (() => { try { return JSON.parse(localStorage.getItem('abc-custom')) || { words: {}, over: {} }; }
                  catch (e) { return { words: {}, over: {} }; } })(),
-  save() { localStorage.setItem('abc-custom', JSON.stringify(this.data)); },
+  save() { localStorage.setItem('abc-custom', JSON.stringify(this.data)); Cloud.schedule(); },
 };
 // 內建單字（套用家長改過的例句文字）+ 家長新增的單字（_custom 標記）
 function allWords(theme) {
@@ -184,6 +184,7 @@ const Mem = {
     ok ? m.ok++ : m.ng++;
     localStorage.setItem('abc-mem', JSON.stringify(this.data));
     if (ok) recordDay();
+    Cloud.schedule();
   },
   // 沒看過的字最優先，常錯的字次之，熟的字降頻
   weight(theme, i) {
@@ -228,7 +229,7 @@ const HERO_COST = [0, 0, 30, 30, 30, 15, 15, 15, 15, 15, 15, 15, 15, 0, 30, 30, 
 const Heroes = {
   data: (() => { try { return JSON.parse(localStorage.getItem('abc-heroes')) || { owned: [0, 1, 13], active: 1 }; }
                  catch (e) { return { owned: [0, 1, 13], active: 1 }; } })(),
-  save() { localStorage.setItem('abc-heroes', JSON.stringify(this.data)); },
+  save() { localStorage.setItem('abc-heroes', JSON.stringify(this.data)); Cloud.schedule(); },
   owns(i) { return this.data.owned.includes(i); },
 };
 const heroTheme = () => THEMES.find(t => t.id === 'heroes');
@@ -298,6 +299,7 @@ $('starCount').textContent = stars;
 function addStar(x, y, n = 1) {
   stars += n;
   localStorage.setItem('abc-stars', stars);
+  Cloud.schedule();
   $('starCount').textContent = stars;
   const target = $('stars').getBoundingClientRect();
   const s = document.createElement('div');
@@ -631,6 +633,7 @@ function openParent() {
   renderParentThemes();
   renderParentAdd();
   renderParentList();
+  renderCloudBox();
 }
 function renderParentThemes() {
   const box = $('parentThemes');
@@ -917,6 +920,46 @@ $('importFile').onchange = (e) => {
   fr.readAsText(f);
 };
 
+/* ================= 雲端備份 UI ================= */
+function renderCloudBox() {
+  const on = Cloud.enabled();
+  $('cloudOff').style.display = on ? 'none' : '';
+  $('cloudSetup').style.display = on ? '' : 'none';
+  if (!on) return;
+  const code = Cloud.getCode();
+  $('familyCode').value = code;
+  $('cloudActions').style.display = code ? 'flex' : 'none';
+  $('cloudStatus').textContent = code ? '同步中的家庭代碼：' + code : '輸入家庭代碼後啟用，全家裝置輸入同一組代碼即可同步。';
+}
+Cloud.onStatus((msg) => { $('cloudStatus').textContent = msg; });
+$('cloudEnableBtn').onclick = async () => {
+  const code = $('familyCode').value.trim();
+  if (code.length < 4) { alert('代碼至少 4 個字，建議加上不易猜到的數字'); return; }
+  Cloud.setCode(code);
+  // 雲端已有這組代碼的備份 → 問要下載還是覆蓋
+  try {
+    const d = await Cloud.pull();
+    if (d && confirm('雲端已有這組代碼的備份，要下載到這台裝置嗎？\n（取消 = 改用這台裝置的資料覆蓋雲端）')) {
+      Cloud.apply(d); location.reload(); return;
+    }
+  } catch (e) {}
+  await Cloud.push();
+  renderCloudBox();
+};
+$('cloudPushBtn').onclick = () => Cloud.push();
+$('cloudPullBtn').onclick = async () => {
+  try {
+    const d = await Cloud.pull();
+    if (!d) { alert('雲端沒有這組代碼的備份'); return; }
+    if (confirm('用雲端備份覆蓋這台裝置的資料？')) { Cloud.apply(d); location.reload(); }
+  } catch (e) { alert('下載失敗：' + e.message); }
+};
+$('cloudOffBtn').onclick = () => {
+  if (confirm('停用這台裝置的自動同步？（雲端備份不會被刪除）')) {
+    Cloud.setCode(''); renderCloudBox();
+  }
+};
+
 /* ================= 首次觸控解鎖音訊（iPad 必要） ================= */
 function firstTouch() {
   AudioEngine.unlock();
@@ -924,3 +967,4 @@ function firstTouch() {
   document.removeEventListener('pointerdown', firstTouch);
 }
 document.addEventListener('pointerdown', firstTouch);
+Cloud.autoRestore();   // 雲端有更新的備份就自動還原

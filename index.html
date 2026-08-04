@@ -86,6 +86,23 @@
   <div id="parentThemes"></div>
   <div id="parentAdd"></div>
   <div id="parentList"></div>
+  <div id="cloudBox">
+    <b>☁️ 雲端自動備份</b>
+    <div id="cloudOff" style="display:none;color:#999;font-size:.9rem;margin-top:6px">雲端功能尚未開通</div>
+    <div id="cloudSetup">
+      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <input type="text" id="familyCode" placeholder="家庭代碼（自己取，例如 chen-family）"
+               style="flex:1;min-width:180px;padding:10px;border-radius:10px;border:2px solid #ddd;font-family:inherit">
+        <button class="pbtn" id="cloudEnableBtn">啟用同步</button>
+      </div>
+      <div id="cloudStatus" style="font-size:.9rem;color:#666;margin-top:6px"></div>
+      <div class="row" id="cloudActions" style="display:none;gap:8px;margin-top:6px">
+        <button class="pbtn" id="cloudPushBtn">⬆️ 立即上傳</button>
+        <button class="pbtn" id="cloudPullBtn">⬇️ 從雲端還原</button>
+        <button class="pbtn del" id="cloudOffBtn">停用</button>
+      </div>
+    </div>
+  </div>
   <div id="parentTools">
     <button class="small-btn" id="exportBtn">匯出備份 ⬇️</button>
     <label class="small-btn pink" style="display:inline-block">匯入備份 ⬆️<input type="file" id="importFile" accept=".json" hidden></label>
@@ -153,6 +170,7 @@
 
 <script src="js/words.js"></script>
 <script src="js/audio.js"></script>
+<script src="js/cloud.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
