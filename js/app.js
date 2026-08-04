@@ -71,6 +71,20 @@ function allWords(theme) {
   const extra = (Custom.data.words[theme.id] || []).map(w => ({ ...w, _custom: true }));
   return base.concat(extra);
 }
+// 家長自訂類別（單字都存在 Custom.data.words[類別id]）
+function customThemes() {
+  return (Custom.data.themes || []).map(ct => ({ ...ct, words: [], _customTheme: true }));
+}
+function allThemes() { return THEMES.concat(customThemes()); }
+// 綜合挑戰：把所有類別的單字混在一起玩
+const MIX_THEME = { id: 'mix', name: '綜合挑戰', emoji: '🌈', color: '#845ec2', words: [] };
+// 遊戲牌組：一般主題＝該主題所有字；綜合＝全部
+function poolFor(theme) {
+  const list = theme.id === 'mix' ? allThemes() : [theme];
+  const out = [];
+  list.forEach(t => allWords(t).forEach((w, i) => out.push({ t, i, w })));
+  return out;
+}
 // 圖片來源：家長換的圖 > 自訂單字的圖 > 內建卡通圖 > emoji
 function imgSrcFor(theme, i) {
   const ov = Custom.data.over[theme.id + '_' + i];
@@ -193,19 +207,23 @@ const Mem = {
     return Math.max(0.35, 1 + m.ng * 0.8 - m.ok * 0.35);
   },
 };
-// 依權重挑一個「該練的字」
-function pickWeighted(theme) {
-  const merged = allWords(theme);
-  const ws = merged.map((_, i) => Mem.weight(theme, i));
-  let r = Math.random() * ws.reduce((a, b) => a + b, 0);
-  for (let i = 0; i < ws.length; i++) { r -= ws[i]; if (r <= 0) return i; }
-  return merged.length - 1;
+// 依權重從牌組挑「該練的字」；excludeKeys＝本輪已出過的（不重複，出完自動重新一輪）
+function pickWeightedRef(pool, excludeKeys) {
+  let cands = pool;
+  if (excludeKeys && excludeKeys.size) {
+    cands = pool.filter(r => !excludeKeys.has(Mem.key(r.t, r.i)));
+    if (!cands.length) { excludeKeys.clear(); cands = pool; }
+  }
+  const ws = cands.map(r => Mem.weight(r.t, r.i));
+  let x = Math.random() * ws.reduce((a, b) => a + b, 0);
+  for (let k = 0; k < cands.length; k++) { x -= ws[k]; if (x <= 0) return cands[k]; }
+  return cands[cands.length - 1];
 }
-// 出題：1 個加權答案 + 3 個隨機干擾
-function pickQuiz(theme) {
-  const merged = allWords(theme);
-  const ans = pickWeighted(theme);
-  const others = shuffled(merged.map((_, i) => i).filter(i => i !== ans)).slice(0, 3);
+// 出題：1 個加權答案 + 3 個隨機干擾（干擾不會跟答案同字）
+function pickQuizPool(pool, excludeKeys) {
+  const ans = pickWeightedRef(pool, excludeKeys);
+  const ansKey = Mem.key(ans.t, ans.i);
+  const others = shuffled(pool.filter(r => Mem.key(r.t, r.i) !== ansKey)).slice(0, 3);
   return { answer: ans, choices: shuffled([ans, ...others]) };
 }
 // 連續學習天數
@@ -333,11 +351,11 @@ function showScreen(name) {
   $('screen-' + name).classList.add('active');
   currentScreen = name;
   $('backBtn').style.display = name === 'menu' ? 'none' : '';
+  if (name === 'menu') $('shopBannerStars').textContent = stars;
 }
 $('homeBtn').onclick = () => { stopSpeech(); stopRecognition(); showScreen('menu'); };
 $('backBtn').onclick = () => {
   stopSpeech(); stopRecognition();
-  if (currentScreen === 'overview') { showScreen('parent'); return; }
   showScreen(['mode', 'parent', 'shop'].includes(currentScreen) ? 'menu' : 'mode');
 };
 $('parentBtn').onclick = () => {
@@ -349,35 +367,46 @@ $('bgmBtn').onclick = () => {
   $('bgmBtn').classList.toggle('off', !on);
 };
 
-/* ================= 主題選單 ================= */
-THEMES.forEach(t => {
-  const c = document.createElement('div');
-  c.className = 'menu-card';
-  c.style.setProperty('--c', t.color);
-  c.innerHTML = `<span class="emoji">${t.emoji}</span><span class="name">${t.name}</span>
-                 <div class="count">${t.words.length} 個單字</div>`;
-  c.onclick = () => openTheme(t);
-  $('themeGrid').appendChild(c);
-});
+/* ================= 主題選單（動態：內建＋自訂＋綜合） ================= */
+function renderThemeMenu() {
+  const grid = $('themeGrid');
+  grid.innerHTML = '';
+  allThemes().concat([MIX_THEME]).forEach(t => {
+    const count = poolFor(t).length;
+    const c = document.createElement('div');
+    c.className = 'menu-card' + (t.id === 'mix' ? ' mix' : '');
+    c.style.setProperty('--c', t.color || '#4ecdc4');
+    c.innerHTML = `<span class="emoji">${t.emoji}</span><span class="name">${t.name}</span>
+                   <div class="count">${t.id === 'mix' ? '全部單字混著玩！' : count + ' 個單字'}</div>`;
+    c.onclick = () => {
+      if (count === 0) { alert('「' + t.name + '」還沒有單字，請先到家長模式新增！'); return; }
+      openTheme(t);
+    };
+    grid.appendChild(c);
+  });
+  $('shopBannerStars').textContent = stars;
+}
 function openTheme(t) {
   currentTheme = t;
   $('modeTitle').textContent = `${t.emoji} ${t.name}`;
   showScreen('mode');
 }
-// 首頁加英雄商店入口
-(function addShopCard() {
-  const c = document.createElement('div');
-  c.className = 'menu-card';
-  c.style.setProperty('--c', '#ffb703');
-  c.innerHTML = `<span class="emoji">🛒</span><span class="name">英雄商店</span>
-                 <div class="count">用星星解鎖英雄！</div>`;
-  c.onclick = () => { showScreen('shop'); renderShop(); AudioEngine.playSfx('jingle'); };
-  $('themeGrid').appendChild(c);
-})();
+renderThemeMenu();
+// 英雄商店入口（獨立橫幅，與主題分開）
+const openShop = () => { showScreen('shop'); renderShop(); AudioEngine.playSfx('jingle'); };
+$('shopBanner').onclick = openShop;
+$('stars').style.cursor = 'pointer';
+$('stars').onclick = () => { if (currentScreen === 'menu') openShop(); };
 $('modeCards').onclick = () => startCardsGame();
-$('modeListen').onclick = () => { listenCorrect = 0; startListenGame(); };
+$('modeListen').onclick = () => {
+  if (poolFor(currentTheme).length < 4) { alert('這個類別至少要 4 個單字才能玩聽聽看喔！'); return; }
+  listenCorrect = 0; listenAsked.clear(); startListenGame();
+};
 $('modeSpeak').onclick = () => startSpeakGame();
-$('modeBattle').onclick = () => startBattleGame();
+$('modeBattle').onclick = () => {
+  if (poolFor(currentTheme).length < 4) { alert('這個類別至少要 4 個單字才能打怪獸喔！'); return; }
+  startBattleGame();
+};
 
 /* ================= 遊戲一：點點聽 ================= */
 function startCardsGame() {
@@ -385,22 +414,24 @@ function startCardsGame() {
   $('cardsTitle').textContent = `${currentTheme.emoji} 點點聽`;
   const grid = $('cardGrid');
   grid.innerHTML = '';
-  allWords(currentTheme).forEach((w, i) => {
+  poolFor(currentTheme).forEach(ref => {
     const c = document.createElement('div');
     c.className = 'word-card';
-    c.style.setProperty('--c', currentTheme.color);
-    c.innerHTML = `${visualHTML(currentTheme, i)}<div class="en">${w.en}</div><div class="zh">${w.zh}</div>`;
+    c.style.setProperty('--c', ref.t.color || currentTheme.color || '#4ecdc4');
+    c.innerHTML = `${visualHTML(ref.t, ref.i)}<div class="en">${ref.w.en}</div><div class="zh">${ref.w.zh}</div>`;
     c.onclick = () => {
       document.querySelectorAll('.word-card').forEach(x => x.classList.remove('speaking'));
       c.classList.add('speaking');
-      playWordSequence(currentTheme, i, () => c.classList.remove('speaking'));
+      playWordSequence(ref.t, ref.i, () => c.classList.remove('speaking'));
     };
     grid.appendChild(c);
   });
 }
 
-/* ================= 遊戲二：聽聽看（答對 5 題過關） ================= */
-let listenAnswer = null, listenAnswerIdx = 0, listenCorrect = 0, listenLock = false;
+/* ================= 遊戲二：聽聽看（答對 5 題過關；同輪不重複出題） ================= */
+let listenAnswer = null;               // 牌組 ref {t, i, w}
+let listenCorrect = 0, listenLock = false;
+const listenAsked = new Set();         // 這一輪出過的字
 const LISTEN_GOAL = 5;
 
 function updateListenProgress() {
@@ -411,22 +442,20 @@ function startListenGame() {
   showScreen('listen');
   listenLock = false;
   updateListenProgress();
-  const merged = allWords(currentTheme);
-  const quiz = pickQuiz(currentTheme);       // 答案加權：優先出沒學過/常錯的字
-  listenAnswerIdx = quiz.answer;
-  listenAnswer = merged[listenAnswerIdx];
+  const quiz = pickQuizPool(poolFor(currentTheme), listenAsked);
+  listenAnswer = quiz.answer;
+  listenAsked.add(Mem.key(listenAnswer.t, listenAnswer.i));
   const grid = $('choiceGrid');
   grid.innerHTML = '';
-  quiz.choices.forEach(i => {
-    const w = merged[i];
+  quiz.choices.forEach(ref => {
     const d = document.createElement('div');
     d.className = 'choice';
-    d.innerHTML = visualHTML(currentTheme, i);
+    d.innerHTML = visualHTML(ref.t, ref.i);
     d.onclick = (e) => {
       if (listenLock) return;
-      if (i === listenAnswerIdx) {
+      if (ref === listenAnswer) {
         listenLock = true;
-        Mem.rec(currentTheme, listenAnswerIdx, true);
+        Mem.rec(ref.t, ref.i, true);
         d.classList.add('correct');
         AudioEngine.playSfx('yay');
         addStar(e.clientX, e.clientY);
@@ -441,7 +470,7 @@ function startListenGame() {
         }
       } else {
         d.classList.add('wrong');
-        Mem.rec(currentTheme, listenAnswerIdx, false);
+        Mem.rec(listenAnswer.t, listenAnswer.i, false);
         AudioEngine.playSfx('wrong');
         setTimeout(() => playTryAgain(), 350);
         setTimeout(() => d.classList.remove('wrong'), 600);
@@ -449,10 +478,10 @@ function startListenGame() {
     };
     grid.appendChild(d);
   });
-  setTimeout(() => { stopSpeech(); chainId++; playWordAudio(currentTheme, listenAnswerIdx, null); }, 500);
+  setTimeout(() => { stopSpeech(); chainId++; playWordAudio(listenAnswer.t, listenAnswer.i, null); }, 500);
 }
 $('bigSpeaker').onclick = () => {
-  if (listenAnswer) { stopSpeech(); chainId++; playWordAudio(currentTheme, listenAnswerIdx, null); }
+  if (listenAnswer) { stopSpeech(); chainId++; playWordAudio(listenAnswer.t, listenAnswer.i, null); }
 };
 function levelClear() {
   AudioEngine.playSfx('fanfare');
@@ -464,12 +493,13 @@ function levelClear() {
 $('clearNextBtn').onclick = () => {
   $('levelClear').classList.remove('show');
   listenCorrect = 0;
+  listenAsked.clear();
   startListenGame();
 };
 
 /* ================= 遊戲三：跟著唸 ================= */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null, speakIdx = 0;
+let recognition = null, speakRef = null;
 const micBtn = $('micBtn'), speakResult = $('speakResult');
 
 function startSpeakGame() {
@@ -487,18 +517,17 @@ function startSpeakGame() {
 }
 function nextSpeakWord() {
   stopRecognition(); stopSpeech();
-  const merged = allWords(currentTheme);
-  speakIdx = Math.floor(Math.random() * merged.length);
-  const w = merged[speakIdx];
+  const pool = poolFor(currentTheme);
+  speakRef = pool[Math.floor(Math.random() * pool.length)];
   $('speakTarget').innerHTML =
-    `${visualHTML(currentTheme, speakIdx)}<div class="en">${w.en}</div><div class="zh">${w.zh}</div>`;
+    `${visualHTML(speakRef.t, speakRef.i)}<div class="en">${speakRef.w.en}</div><div class="zh">${speakRef.w.zh}</div>`;
   speakResult.textContent = '';
   chainId++;
-  playWordAudio(currentTheme, speakIdx, null);
+  playWordAudio(speakRef.t, speakRef.i, null);
 }
 function speakSuccess() {
-  Mem.rec(currentTheme, speakIdx, true);
-  const w = allWords(currentTheme)[speakIdx];
+  Mem.rec(speakRef.t, speakRef.i, true);
+  const w = speakRef.w;
   speakResult.textContent = '🎉 太棒了！' + w.emoji;
   AudioEngine.playSfx('yay');
   playPraise(null);
@@ -512,7 +541,7 @@ function stopRecognition() {
   micBtn.classList.remove('listening');
 }
 micBtn.onclick = () => {
-  if (!SR) return;
+  if (!SR || !speakRef) return;
   if (recognition) { stopRecognition(); return; }
   stopSpeech();
   recognition = new SR();
@@ -523,7 +552,7 @@ micBtn.onclick = () => {
   speakResult.textContent = '👂 我在聽…';
   recognition.onresult = (e) => {
     const alts = [...e.results[0]].map(r => r.transcript.toLowerCase().trim());
-    const target = allWords(currentTheme)[speakIdx].en.toLowerCase();
+    const target = speakRef.w.en.toLowerCase();
     if (alts.some(a => a.includes(target))) {
       speakSuccess();
     } else {
@@ -539,17 +568,19 @@ micBtn.onclick = () => {
   recognition.start();
 };
 $('selfOkBtn').onclick = speakSuccess;
-$('replayBtn').onclick = () => { stopSpeech(); chainId++; playWordAudio(currentTheme, speakIdx, null); };
+$('replayBtn').onclick = () => { if (speakRef) { stopSpeech(); chainId++; playWordAudio(speakRef.t, speakRef.i, null); } };
 $('nextWordBtn').onclick = nextSpeakWord;
 
 /* ================= 遊戲四：英雄打怪獸 ================= */
 const MONSTERS = ['👾', '🐲', '🦖', '👹', '🧌'];
-let battle = { hp: 5, max: 5, answerIdx: 0, lock: false };
+let battle = { hp: 5, max: 5, answer: null, lock: false };
+const battleAsked = new Set();         // 這一場出過的字（不重複）
 
 function startBattleGame() {
   showScreen('battle');
   battle.hp = battle.max = 5;
   battle.lock = false;
+  battleAsked.clear();
   $('heroImg').src = `assets/img/hero_full_${Heroes.data.active}.svg`;   // 出戰中的英雄（全身動畫）
   $('monsterFace').textContent = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
   AudioEngine.playSfx('growl');
@@ -561,24 +592,25 @@ function updateHp() {
 }
 function nextBattleRound() {
   battle.lock = false;
-  const quiz = pickQuiz(currentTheme);       // 加權出題
-  battle.answerIdx = quiz.answer;
+  const quiz = pickQuizPool(poolFor(currentTheme), battleAsked);
+  battle.answer = quiz.answer;
+  battleAsked.add(Mem.key(battle.answer.t, battle.answer.i));
   const grid = $('battleChoices');
   grid.innerHTML = '';
-  quiz.choices.forEach(i => {
+  quiz.choices.forEach(ref => {
     const d = document.createElement('div');
     d.className = 'choice';
-    d.innerHTML = visualHTML(currentTheme, i);
-    d.onclick = () => battleAnswer(i, d);
+    d.innerHTML = visualHTML(ref.t, ref.i);
+    d.onclick = () => battleAnswer(ref, d);
     grid.appendChild(d);
   });
-  setTimeout(() => { stopSpeech(); chainId++; playWordAudio(currentTheme, battle.answerIdx, null); }, 450);
+  setTimeout(() => { stopSpeech(); chainId++; playWordAudio(battle.answer.t, battle.answer.i, null); }, 450);
 }
-function battleAnswer(i, el) {
+function battleAnswer(ref, el) {
   if (battle.lock) return;
-  if (i !== battle.answerIdx) {
+  if (ref !== battle.answer) {
     el.classList.add('wrong');
-    Mem.rec(currentTheme, battle.answerIdx, false);
+    Mem.rec(battle.answer.t, battle.answer.i, false);
     AudioEngine.playSfx('wrong');
     $('monsterFace').classList.add('taunt');
     setTimeout(() => { el.classList.remove('wrong'); $('monsterFace').classList.remove('taunt'); }, 550);
@@ -586,7 +618,7 @@ function battleAnswer(i, el) {
     return;
   }
   battle.lock = true;
-  Mem.rec(currentTheme, battle.answerIdx, true);
+  Mem.rec(battle.answer.t, battle.answer.i, true);
   el.classList.add('correct');
   // 集氣 → 放技能 → 怪獸受傷
   const hero = $('heroImg');
@@ -624,32 +656,61 @@ function battleVictory() {
   $('battleWin').classList.add('show');
 }
 $('battleAgainBtn').onclick = () => { $('battleWin').classList.remove('show'); startBattleGame(); };
-$('battleSpeaker').onclick = () => { stopSpeech(); chainId++; playWordAudio(currentTheme, battle.answerIdx, null); };
+$('battleSpeaker').onclick = () => { if (battle.answer) { stopSpeech(); chainId++; playWordAudio(battle.answer.t, battle.answer.i, null); } };
 
 /* ================= 家長模式 ================= */
 let parentTheme = THEMES[0];
 
 function openParent() {
   showScreen('parent');
-  renderParentThemes();
-  renderParentAdd();
-  renderParentList();
-  renderCloudBox();
+  switchPTab('edit');
 }
+// 分頁切換：教材編輯 / 資料總覽 / 學習報告 / 系統
+function switchPTab(p) {
+  document.querySelectorAll('.ptab').forEach(x => x.classList.toggle('on', x.dataset.p === p));
+  ['edit', 'overview', 'report', 'system'].forEach(x => {
+    $('panel-' + x).style.display = (x === p) ? '' : 'none';
+  });
+  if (p === 'edit') { renderParentThemes(); renderParentAdd(); renderParentList(); }
+  if (p === 'overview') renderOverview();
+  if (p === 'report') renderReport();
+  if (p === 'system') renderCloudBox();
+}
+document.querySelectorAll('.ptab').forEach(b => { b.onclick = () => switchPTab(b.dataset.p); });
+
 function renderParentThemes() {
   const box = $('parentThemes');
   box.innerHTML = '';
-  THEMES.forEach(t => {
+  allThemes().forEach(t => {
     const b = document.createElement('button');
-    b.className = 'ptheme-chip' + (t === parentTheme ? ' on' : '');
+    b.className = 'ptheme-chip' + (t.id === parentTheme.id ? ' on' : '');
     b.textContent = `${t.emoji} ${t.name}`;
-    b.onclick = () => { parentTheme = t; openParent(); };
+    b.onclick = () => { parentTheme = t; switchPTab('edit'); };
     box.appendChild(b);
   });
+  // 新增自訂類別
+  const add = document.createElement('button');
+  add.className = 'ptheme-chip';
+  add.style.borderStyle = 'dashed';
+  add.textContent = '➕ 新增類別';
+  add.onclick = () => {
+    const name = prompt('新類別的名稱（例如：顏色、數字、身體部位）');
+    if (!name || !name.trim()) return;
+    const emoji = (prompt('代表 emoji（例如 🎨），可留空', '📦') || '📦').trim();
+    const ct = { id: 'c' + Date.now(), name: name.trim(), emoji, color: '#ff9f1c' };
+    (Custom.data.themes = Custom.data.themes || []).push(ct);
+    Custom.save();
+    parentTheme = allThemes().find(t => t.id === ct.id);
+    renderThemeMenu();
+    switchPTab('edit');
+  };
+  box.appendChild(add);
 }
 function renderParentAdd() {
+  const delBtn = parentTheme._customTheme
+    ? `<button class="pbtn del" id="delThemeBtn" style="float:right">🗑️ 刪除這個類別</button>` : '';
   $('parentAdd').innerHTML = `
-    <b>➕ 新增「${parentTheme.name}」單字</b>
+    ${delBtn}<b>➕ 新增「${parentTheme.name}」單字</b>
     <div class="row" style="margin-top:8px">
       <input type="text" id="naEn" placeholder="英文（必填）如 grape">
       <input type="text" id="naZh" placeholder="中文（必填）如 葡萄">
@@ -679,7 +740,20 @@ function renderParentAdd() {
     if (imgData) w.img = imgData;
     (Custom.data.words[parentTheme.id] = Custom.data.words[parentTheme.id] || []).push(w);
     Custom.save();
-    openParent();
+    renderThemeMenu();
+    switchPTab('edit');
+  };
+  const dt = $('delThemeBtn');
+  if (dt) dt.onclick = () => {
+    if (!confirm(`確定刪除類別「${parentTheme.name}」和裡面的 ${(Custom.data.words[parentTheme.id] || []).length} 個單字？`)) return;
+    const id = parentTheme.id;
+    Custom.data.themes = (Custom.data.themes || []).filter(t => t.id !== id);
+    delete Custom.data.words[id];
+    Object.keys(Custom.data.over).forEach(k => { if (k.startsWith(id + '_')) delete Custom.data.over[k]; });
+    Custom.save();
+    parentTheme = THEMES[0];
+    renderThemeMenu();
+    switchPTab('edit');
   };
 }
 let expandedIdx = null;   // 目前展開編輯的單字（一次一個）
@@ -788,7 +862,7 @@ function buildEditor(w, i, key) {
   if (del) del.onclick = () => {
     if (confirm(`確定刪除「${w.en}」？`)) {
       Custom.data.words[parentTheme.id].splice(i - parentTheme.words.length, 1);
-      Custom.save(); expandedIdx = null; openParent();
+      Custom.save(); expandedIdx = null; renderThemeMenu(); switchPTab('edit');
     }
   };
   const reset = box.querySelector('#peReset');
@@ -847,18 +921,12 @@ async function toggleRecord(btn, onDone) {
     alert('無法使用麥克風：' + e.message);
   }
 }
-// 學習報告
-$('reportBtn').onclick = () => {
-  const box = $('parentReport');
-  if (box.style.display !== 'none') { box.style.display = 'none'; return; }
-  renderReport();
-  box.style.display = '';
-};
+// 學習報告（分頁）
 function renderReport() {
   const box = $('parentReport');
   let mastered = 0, learning = 0, trouble = 0, unseen = 0;
   let themeHtml = '';
-  THEMES.forEach(t => {
+  allThemes().forEach(t => {
     const goods = [], bads = [];
     allWords(t).forEach((w, i) => {
       const m = Mem.data[Mem.key(t, i)];
@@ -887,12 +955,11 @@ function renderReport() {
     <div style="color:#999;font-size:.85rem;margin-top:10px">✓ 已掌握（答對 3 次以上）　✗ 常錯（建議多練）；「聽聽看」和「打怪獸」會自動優先出還沒學和常錯的字。</div>`;
 }
 
-// 資料總覽：全部教材內容一頁看完
-$('overviewBtn').onclick = () => { showScreen('overview'); renderOverview(); };
+// 資料總覽（分頁）：全部教材內容一頁看完
 function renderOverview() {
   // 統計
   let total = 0, customCount = 0, editedCount = 0, recCount = 0;
-  THEMES.forEach(t => {
+  allThemes().forEach(t => {
     allWords(t).forEach((w, i) => {
       total++;
       if (w._custom) customCount++;
@@ -913,7 +980,7 @@ function renderOverview() {
   // 全部單字列表
   const list = $('ovList');
   list.innerHTML = '';
-  THEMES.forEach(t => {
+  allThemes().forEach(t => {
     const head = document.createElement('div');
     head.className = 'ov-theme-head';
     head.textContent = `${t.emoji} ${t.name}（${allWords(t).length} 個）`;

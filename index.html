@@ -27,6 +27,11 @@
   <h1>🌈 ABC 樂園 🌈</h1>
   <div class="subtitle">選一個主題開始冒險吧！</div>
   <div class="menu-grid" id="themeGrid"></div>
+  <div id="shopBanner">
+    <span class="sb-icon">🛒</span>
+    <span class="sb-text"><b>英雄商店</b><br><small>用星星解鎖新英雄出戰！</small></span>
+    <span class="sb-stars">⭐ <span id="shopBannerStars">0</span></span>
+  </div>
 </div>
 
 <!-- 模式選單 -->
@@ -75,38 +80,57 @@
   <div class="choice-grid" id="battleChoices"></div>
 </div>
 
-<!-- 家長模式 -->
+<!-- 家長模式（四個分頁：教材 / 總覽 / 報告 / 系統） -->
 <div class="screen" id="screen-parent">
   <h1>⚙️ 家長模式</h1>
-  <div class="subtitle">新增單字、更換圖片、錄製聲音（存在這台裝置）</div>
-  <div style="text-align:center;margin-bottom:12px">
-    <button class="small-btn" id="reportBtn">📊 學習報告</button>
-    <button class="small-btn" id="overviewBtn" style="background:#845ec2;box-shadow:0 5px 0 #5d3f8f">🗂 資料總覽</button>
+  <div id="ptabs">
+    <button class="ptab on" data-p="edit">📝 教材編輯</button>
+    <button class="ptab" data-p="overview">🗂 資料總覽</button>
+    <button class="ptab" data-p="report">📊 學習報告</button>
+    <button class="ptab" data-p="system">☁️ 系統</button>
   </div>
-  <div id="parentReport" style="display:none"></div>
-  <div id="parentThemes"></div>
-  <div id="parentAdd"></div>
-  <div id="parentList"></div>
-  <div id="cloudBox">
-    <b>☁️ 雲端自動備份</b>
-    <div id="cloudOff" style="display:none;color:#999;font-size:.9rem;margin-top:6px">雲端功能尚未開通</div>
-    <div id="cloudSetup">
-      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <input type="text" id="familyCode" placeholder="家庭代碼（自己取，例如 chen-family）"
-               style="flex:1;min-width:180px;padding:10px;border-radius:10px;border:2px solid #ddd;font-family:inherit">
-        <button class="pbtn" id="cloudEnableBtn">啟用同步</button>
-      </div>
-      <div id="cloudStatus" style="font-size:.9rem;color:#666;margin-top:6px"></div>
-      <div class="row" id="cloudActions" style="display:none;gap:8px;margin-top:6px">
-        <button class="pbtn" id="cloudPushBtn">⬆️ 立即上傳</button>
-        <button class="pbtn" id="cloudPullBtn">⬇️ 從雲端還原</button>
-        <button class="pbtn del" id="cloudOffBtn">停用</button>
+
+  <div class="ppanel" id="panel-edit">
+    <div id="parentThemes"></div>
+    <div id="parentAdd"></div>
+    <div id="parentList"></div>
+  </div>
+
+  <div class="ppanel" id="panel-overview" style="display:none">
+    <div id="ovSummary"></div>
+    <div id="ovList"></div>
+  </div>
+
+  <div class="ppanel" id="panel-report" style="display:none">
+    <div id="parentReport"></div>
+  </div>
+
+  <div class="ppanel" id="panel-system" style="display:none">
+    <div id="cloudBox">
+      <b>☁️ 雲端自動備份</b>
+      <div id="cloudOff" style="display:none;color:#999;font-size:.9rem;margin-top:6px">雲端功能尚未開通</div>
+      <div id="cloudSetup">
+        <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <input type="text" id="familyCode" placeholder="家庭代碼（自己取，例如 chen-family-123）"
+                 style="flex:1;min-width:180px;padding:10px;border-radius:10px;border:2px solid #ddd;font-family:inherit">
+          <button class="pbtn" id="cloudEnableBtn">啟用同步</button>
+        </div>
+        <div id="cloudStatus" style="font-size:.9rem;color:#666;margin-top:6px"></div>
+        <div class="row" id="cloudActions" style="display:none;gap:8px;margin-top:6px">
+          <button class="pbtn" id="cloudPushBtn">⬆️ 立即上傳</button>
+          <button class="pbtn" id="cloudPullBtn">⬇️ 從雲端還原</button>
+          <button class="pbtn del" id="cloudOffBtn">停用</button>
+        </div>
       </div>
     </div>
-  </div>
-  <div id="parentTools">
-    <button class="small-btn" id="exportBtn">匯出備份 ⬇️</button>
-    <label class="small-btn pink" style="display:inline-block">匯入備份 ⬆️<input type="file" id="importFile" accept=".json" hidden></label>
+    <div id="fileBox">
+      <b>📁 檔案備份</b>
+      <div style="color:#999;font-size:.9rem;margin:6px 0">下載/匯入完整備份檔（自訂內容、學習紀錄、英雄、星星）</div>
+      <div id="parentTools">
+        <button class="small-btn" id="exportBtn">匯出備份 ⬇️</button>
+        <label class="small-btn pink" style="display:inline-block">匯入備份 ⬆️<input type="file" id="importFile" accept=".json" hidden></label>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -143,14 +167,6 @@
 
 <!-- 例句字幕 -->
 <div id="sentenceBox"><div class="sen-en"></div><div class="sen-zh"></div></div>
-
-<!-- 資料總覽（家長） -->
-<div class="screen" id="screen-overview">
-  <h1>🗂 資料總覽</h1>
-  <div class="subtitle">全部教材內容一覽（點喇叭試聽）</div>
-  <div id="ovSummary"></div>
-  <div id="ovList"></div>
-</div>
 
 <!-- PIN 碼閘門 -->
 <div id="pinGate">
