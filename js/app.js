@@ -58,10 +58,18 @@ const Custom = {
                  catch (e) { return { words: {}, over: {} }; } })(),
   save() { localStorage.setItem('abc-custom', JSON.stringify(this.data)); },
 };
-// 內建單字 + 家長新增的單字（_custom 標記）
+// 內建單字（套用家長改過的例句文字）+ 家長新增的單字（_custom 標記）
 function allWords(theme) {
+  const base = theme.words.map((w, i) => {
+    const ov = Custom.data.over[theme.id + '_' + i];
+    if (ov && (ov.sen !== undefined || ov.szh !== undefined)) {
+      return { ...w, sen: ov.sen !== undefined ? ov.sen : w.sen,
+                     szh: ov.szh !== undefined ? ov.szh : w.szh };
+    }
+    return w;
+  });
   const extra = (Custom.data.words[theme.id] || []).map(w => ({ ...w, _custom: true }));
-  return theme.words.concat(extra);
+  return base.concat(extra);
 }
 // 圖片來源：家長換的圖 > 自訂單字的圖 > 內建卡通圖 > emoji
 function imgSrcFor(theme, i) {
@@ -77,6 +85,8 @@ function audioSrcFor(theme, i, kind) {   // kind: 'w' 單字 | 's' 例句
   if (ov && ov['a' + kind]) return ov['a' + kind];
   const w = allWords(theme)[i];
   if (w._custom) return w['a' + kind] || null;
+  // 例句文字被家長改過但沒錄新音檔 → 不能再用內建音檔，改用 TTS 唸新句子
+  if (kind === 's' && ov && (ov.sen !== undefined || ov.szh !== undefined)) return null;
   return `assets/voice/${theme.id}_${i}_${kind}.mp3`;
 }
 
@@ -555,54 +565,123 @@ function renderParentAdd() {
     openParent();
   };
 }
+let expandedIdx = null;   // 目前展開編輯的單字（一次一個）
+
 function renderParentList() {
   const list = $('parentList');
   list.innerHTML = '';
-  const merged = allWords(parentTheme);
-  merged.forEach((w, i) => {
+  allWords(parentTheme).forEach((w, i) => {
     const key = parentTheme.id + '_' + i;
     const row = document.createElement('div');
-    row.className = 'prow';
+    row.className = 'prow' + (expandedIdx === i ? ' open' : '');
     const src = imgSrcFor(parentTheme, i);
-    row.innerHTML = `
+    const head = document.createElement('div');
+    head.className = 'prow-head';
+    head.innerHTML = `
       ${src ? `<img class="thumb" src="${src}" onerror="this.outerHTML='<span class=thumb>${w.emoji || '⭐'}</span>'">`
             : `<span class="thumb">${w.emoji || '⭐'}</span>`}
       <div class="ptxt"><div class="p-en">${w.en} ${w._custom ? '<span class="badge-custom">自訂</span>' : ''}</div>
       <div class="p-zh">${w.zh}</div></div>
-      <label class="pbtn">📷 換圖<input type="file" accept="image/*" hidden></label>
-      <button class="pbtn rec" data-k="w">🎙️ 錄單字</button>
-      <button class="pbtn rec" data-k="s">🎙️ 錄例句</button>
-      <button class="pbtn">▶ 試聽</button>
-      ${w._custom ? '<button class="pbtn del">🗑️</button>' : ''}`;
-    // 換圖
-    row.querySelector('input[type=file]').onchange = async (e) => {
-      if (!e.target.files[0]) return;
-      const data = await fileToThumb(e.target.files[0]);
-      if (w._custom) { getCustomWord(i).img = data; }
-      else { (Custom.data.over[key] = Custom.data.over[key] || {}).img = data; }
-      Custom.save(); renderParentList();
-    };
-    // 錄音（單字 / 例句）
-    row.querySelectorAll('.pbtn.rec').forEach(btn => {
-      btn.onclick = () => toggleRecord(btn, async (dataUrl) => {
-        const k = 'a' + btn.dataset.k;
-        if (w._custom) { getCustomWord(i)[k] = dataUrl; }
-        else { (Custom.data.over[key] = Custom.data.over[key] || {})[k] = dataUrl; }
-        Custom.save();
-      });
-    });
-    // 試聽與刪除
-    row.querySelectorAll('.pbtn').forEach(b => {
-      if (b.textContent.includes('試聽')) b.onclick = () => playWordSequence(parentTheme, i, null);
-      if (b.classList.contains('del')) b.onclick = () => {
-        if (confirm(`確定刪除「${w.en}」？`)) {
-          Custom.data.words[parentTheme.id].splice(i - parentTheme.words.length, 1);
-          Custom.save(); openParent();
-        }
-      };
-    });
+      <span class="p-arrow">${expandedIdx === i ? '▲' : '▼'}</span>`;
+    head.onclick = () => { expandedIdx = (expandedIdx === i ? null : i); renderParentList(); };
+    row.appendChild(head);
+    if (expandedIdx === i) row.appendChild(buildEditor(w, i, key));
     list.appendChild(row);
   });
+}
+
+// 展開的編輯面板：改文字、換圖、錄音/上傳音檔、試聽
+function buildEditor(w, i, key) {
+  const box = document.createElement('div');
+  box.className = 'pedit';
+  const textRows = w._custom ? `
+    <div class="row"><input type="text" id="peEn" value="${w.en}" placeholder="英文">
+      <input type="text" id="peZh" value="${w.zh}" placeholder="中文">
+      <input type="text" id="peEmoji" value="${w.emoji || ''}" placeholder="emoji" style="max-width:90px"></div>` : '';
+  box.innerHTML = `
+    ${textRows}
+    <div class="sec-label">📝 例句（改完按儲存，會改用新句子朗讀）</div>
+    <div class="row"><input type="text" id="peSen" value="${(w.sen || '').replace(/"/g, '&quot;')}" placeholder="英文例句">
+      <input type="text" id="peSzh" value="${(w.szh || '').replace(/"/g, '&quot;')}" placeholder="中文例句"></div>
+    <div class="row"><button class="pbtn" id="peSave" style="border-color:#2ecc71;font-weight:bold">💾 儲存文字</button>
+      <label class="pbtn">📷 換圖片<input type="file" id="peImg" accept="image/*" hidden></label></div>
+    <div class="sec-label">🔊 單字聲音</div>
+    <div class="row">
+      <button class="pbtn rec" id="peRecW" data-k="w">🎙️ 錄音</button>
+      <label class="pbtn">📁 上傳音檔<input type="file" id="peUpW" accept="audio/*" hidden></label>
+      <button class="pbtn" id="pePlayW">▶ 試聽單字</button></div>
+    <div class="sec-label">🔊 例句聲音</div>
+    <div class="row">
+      <button class="pbtn rec" id="peRecS" data-k="s">🎙️ 錄音</button>
+      <label class="pbtn">📁 上傳音檔<input type="file" id="peUpS" accept="audio/*" hidden></label>
+      <button class="pbtn" id="pePlayS">▶ 試聽例句</button></div>
+    <div class="row">
+      <button class="pbtn" id="pePlayAll">▶▶ 完整試聽</button>
+      ${w._custom ? '<button class="pbtn del" id="peDel">🗑️ 刪除這個單字</button>'
+                  : (Custom.data.over[key] ? '<button class="pbtn del" id="peReset">♻️ 還原預設</button>' : '')}
+    </div>`;
+
+  const setAudio = (k, dataUrl) => {
+    if (w._custom) getCustomWord(i)['a' + k] = dataUrl;
+    else (Custom.data.over[key] = Custom.data.over[key] || {})['a' + k] = dataUrl;
+    Custom.save();
+  };
+  const fileToDataUrl = (file, cb) => {
+    const fr = new FileReader();
+    fr.onload = () => cb(fr.result);
+    fr.readAsDataURL(file);
+  };
+
+  box.querySelector('#peSave').onclick = () => {
+    if (w._custom) {
+      const cw = getCustomWord(i);
+      cw.en = box.querySelector('#peEn').value.trim() || cw.en;
+      cw.zh = box.querySelector('#peZh').value.trim() || cw.zh;
+      cw.emoji = box.querySelector('#peEmoji').value.trim() || cw.emoji;
+      cw.sen = box.querySelector('#peSen').value.trim();
+      cw.szh = box.querySelector('#peSzh').value.trim();
+    } else {
+      const ov = Custom.data.over[key] = Custom.data.over[key] || {};
+      ov.sen = box.querySelector('#peSen').value.trim();
+      ov.szh = box.querySelector('#peSzh').value.trim();
+    }
+    Custom.save();
+    AudioEngine.playSfx('ding');
+    renderParentList();
+  };
+  box.querySelector('#peImg').onchange = async (e) => {
+    if (!e.target.files[0]) return;
+    const data = await fileToThumb(e.target.files[0]);
+    if (w._custom) getCustomWord(i).img = data;
+    else (Custom.data.over[key] = Custom.data.over[key] || {}).img = data;
+    Custom.save(); renderParentList();
+  };
+  box.querySelector('#peRecW').onclick = () => toggleRecord(box.querySelector('#peRecW'), d => setAudio('w', d));
+  box.querySelector('#peRecS').onclick = () => toggleRecord(box.querySelector('#peRecS'), d => setAudio('s', d));
+  box.querySelector('#peUpW').onchange = (e) => {
+    if (e.target.files[0]) fileToDataUrl(e.target.files[0], d => { setAudio('w', d); AudioEngine.playSfx('ding'); });
+  };
+  box.querySelector('#peUpS').onchange = (e) => {
+    if (e.target.files[0]) fileToDataUrl(e.target.files[0], d => { setAudio('s', d); AudioEngine.playSfx('ding'); });
+  };
+  box.querySelector('#pePlayW').onclick = () => { stopSpeech(); chainId++; playWordAudio(parentTheme, i, null); };
+  box.querySelector('#pePlayS').onclick = () => { stopSpeech(); chainId++; playSentenceAudio(parentTheme, i, null); };
+  box.querySelector('#pePlayAll').onclick = () => playWordSequence(parentTheme, i, null);
+  const del = box.querySelector('#peDel');
+  if (del) del.onclick = () => {
+    if (confirm(`確定刪除「${w.en}」？`)) {
+      Custom.data.words[parentTheme.id].splice(i - parentTheme.words.length, 1);
+      Custom.save(); expandedIdx = null; openParent();
+    }
+  };
+  const reset = box.querySelector('#peReset');
+  if (reset) reset.onclick = () => {
+    if (confirm('還原這個單字的預設圖片、聲音與例句？')) {
+      delete Custom.data.over[key];
+      Custom.save(); renderParentList();
+    }
+  };
+  return box;
 }
 function getCustomWord(mergedIdx) {
   return Custom.data.words[parentTheme.id][mergedIdx - parentTheme.words.length];
