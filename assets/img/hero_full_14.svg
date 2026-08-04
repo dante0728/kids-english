@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 460"><style>
+.bob{animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px)}}
+.hover{animation:hover 1.4s ease-in-out infinite}
+@keyframes hover{50%{transform:translateY(-16px)}}
+.cape{animation:flutter 2.2s ease-in-out infinite;transform-origin:160px 215px}
+@keyframes flutter{50%{transform:skewX(7deg) scaleX(1.06)}}
+.jet{animation:flick .28s infinite alternate;transform-origin:center bottom}
+@keyframes flick{to{opacity:.45;transform:scaleY(.6)}}
+.flex{animation:flex 1.2s ease-in-out infinite;transform-origin:160px 250px}
+@keyframes flex{50%{transform:rotate(3deg) scale(1.04)}}
+.webline{animation:webpulse 1.6s infinite}
+@keyframes webpulse{50%{opacity:.35}}
+.shield-arm{animation:shieldup 2s ease-in-out infinite;transform-origin:118px 250px}
+@keyframes shieldup{50%{transform:rotate(-7deg)}}
+.spin{animation:spin 3s linear infinite;transform-origin:var(--o)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.zapflick{animation:zapflick .5s infinite alternate}
+@keyframes zapflick{to{opacity:.2}}
+.shrink{animation:shrink 2.4s ease-in-out infinite;transform-origin:160px 430px}
+@keyframes shrink{50%{transform:scale(.72)}}
+.sway{animation:sway 2.6s ease-in-out infinite;transform-origin:160px 300px}
+@keyframes sway{50%{transform:skewX(-5deg)}}
+.shimmer{animation:shimmer 1s infinite alternate}
+@keyframes shimmer{to{opacity:.35}}
+.speed{animation:speed .5s infinite}
+@keyframes speed{50%{opacity:.15;transform:translateX(-14px)}}
+.rise{animation:rise 2.4s linear infinite}
+@keyframes rise{to{transform:translateY(-70px);opacity:0}}
+.glowp{animation:glowp 1.3s ease-in-out infinite}
+@keyframes glowp{50%{transform:scale(1.25);opacity:.6}}
+.wag{animation:wag 1.5s ease-in-out infinite;transform-origin:220px 340px}
+@keyframes wag{50%{transform:rotate(14deg)}}
+</style><g class="bob"><path class="cape" d="M112 226 Q86 320 66 414 L96 396 L120 416 L150 398 L170 416 L200 398 L224 416 L254 396 Q234 320 208 226 Z" fill="#20232a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="124" y="340" width="30" height="80" rx="15" fill="#484f59" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="166" y="340" width="30" height="80" rx="15" fill="#484f59" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="120" y="400" width="38" height="22" rx="11" fill="#20232a" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="162" y="400" width="38" height="22" rx="11" fill="#20232a" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="76" y="238" width="30" height="86" rx="15" fill="#484f59" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="rotate(18 91 245)"/><rect x="214" y="238" width="30" height="86" rx="15" fill="#484f59" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-18 229 245)"/><path d="M118 226 Q160 214 202 226 L208 320 Q160 340 112 320 Z" fill="#484f59" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="160" cy="258" rx="34" ry="16" fill="#f2a900" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M140 258 Q150 250 155 256 L160 250 L165 256 Q170 250 180 258 Q170 266 160 262 Q150 266 140 258 Z" fill="#1a1a1a"/><rect x="118" y="304" width="84" height="14" rx="7" fill="#f2a900" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M112 78 L102 28 L138 62 Z" fill="#20232a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M208 78 L218 28 L182 62 Z" fill="#20232a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="160" cy="128" r="80" fill="#6d6d6d" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M82 122 Q84 68 160 64 Q236 68 238 122 L238 136 Q206 152 160 150 Q114 152 82 136 Z" fill="#20232a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M124 116 L152 122 L147 138 L120 130 Z" fill="#fff" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M196 116 L168 122 L173 138 L200 130 Z" fill="#fff" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M140 176 L180 176" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g></svg>

@@ -174,6 +174,105 @@ function playWordSequence(theme, i, onDone) {
   }, Math.max(dur * 1000, 300) + 150);
 }
 
+/* ================= 記憶追蹤（間隔重複的簡化版） ================= */
+const Mem = {
+  data: (() => { try { return JSON.parse(localStorage.getItem('abc-mem')) || {}; } catch (e) { return {}; } })(),
+  key(theme, i) { return theme.id + '_' + i; },
+  rec(theme, i, ok) {
+    const k = this.key(theme, i);
+    const m = this.data[k] = this.data[k] || { ok: 0, ng: 0 };
+    ok ? m.ok++ : m.ng++;
+    localStorage.setItem('abc-mem', JSON.stringify(this.data));
+    if (ok) recordDay();
+  },
+  // 沒看過的字最優先，常錯的字次之，熟的字降頻
+  weight(theme, i) {
+    const m = this.data[this.key(theme, i)];
+    if (!m) return 2.2;
+    return Math.max(0.35, 1 + m.ng * 0.8 - m.ok * 0.35);
+  },
+};
+// 依權重挑一個「該練的字」
+function pickWeighted(theme) {
+  const merged = allWords(theme);
+  const ws = merged.map((_, i) => Mem.weight(theme, i));
+  let r = Math.random() * ws.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < ws.length; i++) { r -= ws[i]; if (r <= 0) return i; }
+  return merged.length - 1;
+}
+// 出題：1 個加權答案 + 3 個隨機干擾
+function pickQuiz(theme) {
+  const merged = allWords(theme);
+  const ans = pickWeighted(theme);
+  const others = shuffled(merged.map((_, i) => i).filter(i => i !== ans)).slice(0, 3);
+  return { answer: ans, choices: shuffled([ans, ...others]) };
+}
+// 連續學習天數
+function recordDay() {
+  const d = new Date().toISOString().slice(0, 10);
+  const days = JSON.parse(localStorage.getItem('abc-days') || '[]');
+  if (!days.includes(d)) { days.push(d); localStorage.setItem('abc-days', JSON.stringify(days)); }
+}
+function streakDays() {
+  const days = new Set(JSON.parse(localStorage.getItem('abc-days') || '[]'));
+  let n = 0;
+  const t = new Date();
+  if (!days.has(t.toISOString().slice(0, 10))) t.setDate(t.getDate() - 1);  // 今天還沒學，從昨天往回數
+  while (days.has(t.toISOString().slice(0, 10))) { n++; t.setDate(t.getDate() - 1); }
+  return n;
+}
+
+/* ================= 英雄收藏與商店 ================= */
+// 免費：鋼鐵人0/蜘蛛人1/超人13；熱門 30⭐；其他 15⭐
+const HERO_COST = [0, 0, 30, 30, 30, 15, 15, 15, 15, 15, 15, 15, 15, 0, 30, 30, 30, 15, 15, 15];
+const Heroes = {
+  data: (() => { try { return JSON.parse(localStorage.getItem('abc-heroes')) || { owned: [0, 1, 13], active: 1 }; }
+                 catch (e) { return { owned: [0, 1, 13], active: 1 }; } })(),
+  save() { localStorage.setItem('abc-heroes', JSON.stringify(this.data)); },
+  owns(i) { return this.data.owned.includes(i); },
+};
+const heroTheme = () => THEMES.find(t => t.id === 'heroes');
+
+function renderShop() {
+  const grid = $('shopGrid');
+  grid.innerHTML = '';
+  heroTheme().words.forEach((w, i) => {
+    const owned = Heroes.owns(i);
+    const isActive = Heroes.data.active === i;
+    const card = document.createElement('div');
+    card.className = 'shop-card ' + (isActive ? 'active-hero' : owned ? 'owned' : 'locked');
+    card.innerHTML = `
+      ${isActive ? '<span class="badge">⚔️</span>' : owned ? '<span class="badge">✅</span>' : ''}
+      <img src="assets/img/hero_full_${i}.svg" alt="${w.en}">
+      <div class="sname">${w.zh}</div>
+      <div class="sprice">${owned ? (isActive ? '出戰中！' : '點我出戰') : '⭐ ' + HERO_COST[i]}</div>`;
+    card.onclick = () => {
+      if (owned) {
+        Heroes.data.active = i; Heroes.save();
+        AudioEngine.playSfx('ding');
+        renderShop();
+      } else if (stars >= HERO_COST[i]) {
+        stars -= HERO_COST[i];
+        localStorage.setItem('abc-stars', stars);
+        $('starCount').textContent = stars;
+        Heroes.data.owned.push(i);
+        Heroes.data.active = i; Heroes.save();
+        AudioEngine.playSfx('fanfare');
+        celebrate(true);
+        playPraise(null);
+        renderShop();
+      } else {
+        AudioEngine.playSfx('wrong');
+        card.classList.add('nostars');
+        const p = card.querySelector('.sprice');
+        p.textContent = '星星不夠，繼續加油！';
+        setTimeout(() => { card.classList.remove('nostars'); p.textContent = '⭐ ' + HERO_COST[i]; }, 1400);
+      }
+    };
+    grid.appendChild(card);
+  });
+}
+
 /* ================= 單字圖示（統一卡通圖庫、emoji 備援） ================= */
 function visualHTML(theme, i) {
   const w = allWords(theme)[i];
@@ -236,7 +335,7 @@ function showScreen(name) {
 $('homeBtn').onclick = () => { stopSpeech(); stopRecognition(); showScreen('menu'); };
 $('backBtn').onclick = () => {
   stopSpeech(); stopRecognition();
-  showScreen(currentScreen === 'mode' || currentScreen === 'parent' ? 'menu' : 'mode');
+  showScreen(['mode', 'parent', 'shop'].includes(currentScreen) ? 'menu' : 'mode');
 };
 $('parentBtn').onclick = () => {
   stopSpeech(); stopRecognition();
@@ -262,6 +361,16 @@ function openTheme(t) {
   $('modeTitle').textContent = `${t.emoji} ${t.name}`;
   showScreen('mode');
 }
+// 首頁加英雄商店入口
+(function addShopCard() {
+  const c = document.createElement('div');
+  c.className = 'menu-card';
+  c.style.setProperty('--c', '#ffb703');
+  c.innerHTML = `<span class="emoji">🛒</span><span class="name">英雄商店</span>
+                 <div class="count">用星星解鎖英雄！</div>`;
+  c.onclick = () => { showScreen('shop'); renderShop(); AudioEngine.playSfx('jingle'); };
+  $('themeGrid').appendChild(c);
+})();
 $('modeCards').onclick = () => startCardsGame();
 $('modeListen').onclick = () => { listenCorrect = 0; startListenGame(); };
 $('modeSpeak').onclick = () => startSpeakGame();
@@ -300,12 +409,12 @@ function startListenGame() {
   listenLock = false;
   updateListenProgress();
   const merged = allWords(currentTheme);
-  const idxs = shuffled(merged.map((_, i) => i)).slice(0, 4);
-  listenAnswerIdx = idxs[Math.floor(Math.random() * idxs.length)];
+  const quiz = pickQuiz(currentTheme);       // 答案加權：優先出沒學過/常錯的字
+  listenAnswerIdx = quiz.answer;
   listenAnswer = merged[listenAnswerIdx];
   const grid = $('choiceGrid');
   grid.innerHTML = '';
-  idxs.forEach(i => {
+  quiz.choices.forEach(i => {
     const w = merged[i];
     const d = document.createElement('div');
     d.className = 'choice';
@@ -314,6 +423,7 @@ function startListenGame() {
       if (listenLock) return;
       if (i === listenAnswerIdx) {
         listenLock = true;
+        Mem.rec(currentTheme, listenAnswerIdx, true);
         d.classList.add('correct');
         AudioEngine.playSfx('yay');
         addStar(e.clientX, e.clientY);
@@ -328,6 +438,7 @@ function startListenGame() {
         }
       } else {
         d.classList.add('wrong');
+        Mem.rec(currentTheme, listenAnswerIdx, false);
         AudioEngine.playSfx('wrong');
         setTimeout(() => playTryAgain(), 350);
         setTimeout(() => d.classList.remove('wrong'), 600);
@@ -383,6 +494,7 @@ function nextSpeakWord() {
   playWordAudio(currentTheme, speakIdx, null);
 }
 function speakSuccess() {
+  Mem.rec(currentTheme, speakIdx, true);
   const w = allWords(currentTheme)[speakIdx];
   speakResult.textContent = '🎉 太棒了！' + w.emoji;
   AudioEngine.playSfx('yay');
@@ -435,7 +547,7 @@ function startBattleGame() {
   showScreen('battle');
   battle.hp = battle.max = 5;
   battle.lock = false;
-  $('heroImg').src = `assets/img/heroes_${Math.floor(Math.random() * 20)}.svg`;
+  $('heroImg').src = `assets/img/hero_full_${Heroes.data.active}.svg`;   // 出戰中的英雄（全身動畫）
   $('monsterFace').textContent = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
   AudioEngine.playSfx('growl');
   updateHp();
@@ -446,12 +558,11 @@ function updateHp() {
 }
 function nextBattleRound() {
   battle.lock = false;
-  const merged = allWords(currentTheme);
-  const idxs = shuffled(merged.map((_, i) => i)).slice(0, 4);
-  battle.answerIdx = idxs[Math.floor(Math.random() * idxs.length)];
+  const quiz = pickQuiz(currentTheme);       // 加權出題
+  battle.answerIdx = quiz.answer;
   const grid = $('battleChoices');
   grid.innerHTML = '';
-  idxs.forEach(i => {
+  quiz.choices.forEach(i => {
     const d = document.createElement('div');
     d.className = 'choice';
     d.innerHTML = visualHTML(currentTheme, i);
@@ -464,6 +575,7 @@ function battleAnswer(i, el) {
   if (battle.lock) return;
   if (i !== battle.answerIdx) {
     el.classList.add('wrong');
+    Mem.rec(currentTheme, battle.answerIdx, false);
     AudioEngine.playSfx('wrong');
     $('monsterFace').classList.add('taunt');
     setTimeout(() => { el.classList.remove('wrong'); $('monsterFace').classList.remove('taunt'); }, 550);
@@ -471,6 +583,7 @@ function battleAnswer(i, el) {
     return;
   }
   battle.lock = true;
+  Mem.rec(currentTheme, battle.answerIdx, true);
   el.classList.add('correct');
   // 集氣 → 放技能 → 怪獸受傷
   const hero = $('heroImg');
@@ -730,9 +843,53 @@ async function toggleRecord(btn, onDone) {
     alert('無法使用麥克風：' + e.message);
   }
 }
+// 學習報告
+$('reportBtn').onclick = () => {
+  const box = $('parentReport');
+  if (box.style.display !== 'none') { box.style.display = 'none'; return; }
+  renderReport();
+  box.style.display = '';
+};
+function renderReport() {
+  const box = $('parentReport');
+  let mastered = 0, learning = 0, trouble = 0, unseen = 0;
+  let themeHtml = '';
+  THEMES.forEach(t => {
+    const goods = [], bads = [];
+    allWords(t).forEach((w, i) => {
+      const m = Mem.data[Mem.key(t, i)];
+      if (!m) { unseen++; return; }
+      if (m.ok >= 3 && m.ok > m.ng) { mastered++; goods.push(w.en); }
+      else if (m.ng >= 2 && m.ng >= m.ok) { trouble++; bads.push(w.en); }
+      else learning++;
+    });
+    if (goods.length || bads.length) {
+      themeHtml += `<div class="rp-theme"><b>${t.emoji} ${t.name}</b><div class="rp-chips">
+        ${goods.map(x => `<span class="rp-chip good">✓ ${x}</span>`).join('')}
+        ${bads.map(x => `<span class="rp-chip bad">✗ ${x}</span>`).join('')}
+      </div></div>`;
+    }
+  });
+  box.innerHTML = `
+    <h3>📊 學習報告</h3>
+    <div class="rp-stats">
+      <div class="rp-stat"><div class="num">${streakDays()}</div><div class="lab">連續學習天數</div></div>
+      <div class="rp-stat"><div class="num">${mastered}</div><div class="lab">已掌握</div></div>
+      <div class="rp-stat"><div class="num">${learning}</div><div class="lab">學習中</div></div>
+      <div class="rp-stat"><div class="num">${trouble}</div><div class="lab">常錯字</div></div>
+      <div class="rp-stat"><div class="num">${unseen}</div><div class="lab">還沒學</div></div>
+    </div>
+    ${themeHtml || '<div style="color:#999">還沒有學習紀錄，玩過「聽聽看」或「打怪獸」就會開始記錄囉！</div>'}
+    <div style="color:#999;font-size:.85rem;margin-top:10px">✓ 已掌握（答對 3 次以上）　✗ 常錯（建議多練）；「聽聽看」和「打怪獸」會自動優先出還沒學和常錯的字。</div>`;
+}
+
 // 匯出 / 匯入備份
 $('exportBtn').onclick = () => {
-  const blob = new Blob([JSON.stringify(Custom.data)], { type: 'application/json' });
+  const bundle = {
+    custom: Custom.data, mem: Mem.data, heroes: Heroes.data, stars,
+    days: JSON.parse(localStorage.getItem('abc-days') || '[]'),
+  };
+  const blob = new Blob([JSON.stringify(bundle)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'abc-backup.json';
@@ -745,8 +902,15 @@ $('importFile').onchange = (e) => {
   fr.onload = () => {
     try {
       const d = JSON.parse(fr.result);
-      if (!d.words || !d.over) throw new Error('格式不對');
-      Custom.data = d; Custom.save();
+      if (d.words && d.over) {           // 舊版備份（只有自訂內容）
+        Custom.data = d; Custom.save();
+      } else if (d.custom) {             // 完整備份
+        Custom.data = d.custom; Custom.save();
+        if (d.mem) { Mem.data = d.mem; localStorage.setItem('abc-mem', JSON.stringify(d.mem)); }
+        if (d.heroes) { Heroes.data = d.heroes; Heroes.save(); }
+        if (typeof d.stars === 'number') { stars = d.stars; localStorage.setItem('abc-stars', stars); $('starCount').textContent = stars; }
+        if (d.days) localStorage.setItem('abc-days', JSON.stringify(d.days));
+      } else throw new Error('格式不對');
       alert('匯入成功！'); openParent();
     } catch (err) { alert('匯入失敗：' + err.message); }
   };

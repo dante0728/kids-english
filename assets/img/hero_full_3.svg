@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 460"><style>
+.bob{animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px)}}
+.hover{animation:hover 1.4s ease-in-out infinite}
+@keyframes hover{50%{transform:translateY(-16px)}}
+.cape{animation:flutter 2.2s ease-in-out infinite;transform-origin:160px 215px}
+@keyframes flutter{50%{transform:skewX(7deg) scaleX(1.06)}}
+.jet{animation:flick .28s infinite alternate;transform-origin:center bottom}
+@keyframes flick{to{opacity:.45;transform:scaleY(.6)}}
+.flex{animation:flex 1.2s ease-in-out infinite;transform-origin:160px 250px}
+@keyframes flex{50%{transform:rotate(3deg) scale(1.04)}}
+.webline{animation:webpulse 1.6s infinite}
+@keyframes webpulse{50%{opacity:.35}}
+.shield-arm{animation:shieldup 2s ease-in-out infinite;transform-origin:118px 250px}
+@keyframes shieldup{50%{transform:rotate(-7deg)}}
+.spin{animation:spin 3s linear infinite;transform-origin:var(--o)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.zapflick{animation:zapflick .5s infinite alternate}
+@keyframes zapflick{to{opacity:.2}}
+.shrink{animation:shrink 2.4s ease-in-out infinite;transform-origin:160px 430px}
+@keyframes shrink{50%{transform:scale(.72)}}
+.sway{animation:sway 2.6s ease-in-out infinite;transform-origin:160px 300px}
+@keyframes sway{50%{transform:skewX(-5deg)}}
+.shimmer{animation:shimmer 1s infinite alternate}
+@keyframes shimmer{to{opacity:.35}}
+.speed{animation:speed .5s infinite}
+@keyframes speed{50%{opacity:.15;transform:translateX(-14px)}}
+.rise{animation:rise 2.4s linear infinite}
+@keyframes rise{to{transform:translateY(-70px);opacity:0}}
+.glowp{animation:glowp 1.3s ease-in-out infinite}
+@keyframes glowp{50%{transform:scale(1.25);opacity:.6}}
+.wag{animation:wag 1.5s ease-in-out infinite;transform-origin:220px 340px}
+@keyframes wag{50%{transform:rotate(14deg)}}
+</style><g class="bob"><rect x="118" y="336" width="36" height="84" rx="18" fill="#5f2a84" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="166" y="336" width="36" height="84" rx="18" fill="#5f2a84" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="112" y="400" width="44" height="24" rx="12" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="164" y="400" width="44" height="24" rx="12" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><g class="flex"><rect x="58" y="252" width="34" height="72" rx="17" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="rotate(40 75 258)"/><rect x="34" y="196" width="34" height="76" rx="17" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-24 51 202)"/><circle cx="42" cy="192" r="20" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="228" y="252" width="34" height="72" rx="17" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-40 245 258)"/><rect x="252" y="196" width="34" height="76" rx="17" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="rotate(24 269 202)"/><circle cx="278" cy="192" r="20" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M108 224 Q160 208 212 224 L216 322 Q160 344 104 322 Z" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M130 250 Q160 262 190 250 M136 286 Q160 296 184 286" fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="160" cy="124" r="76" fill="#4c9a2a" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M92 92 Q108 48 160 52 Q212 48 228 92 Q204 70 160 74 Q116 70 92 92 Z" fill="#173317" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><line x1="118" y1="112" x2="148" y2="122" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><line x1="202" y1="112" x2="172" y2="122" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="134" cy="136" r="8" fill="#1a1a1a"/><circle cx="186" cy="136" r="8" fill="#1a1a1a"/><path d="M132 172 Q160 160 188 172" fill="none" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
