@@ -150,6 +150,75 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 .choice .emoji { line-height: 1.2; }
 #speakTarget .pic img { width: 140px; height: 140px; border-radius: 22px; }
 
+/* ===== PIN 碼閘門 ===== */
+#pinGate { position: fixed; inset: 0; background: linear-gradient(160deg, #aee9ff, #ffd6e8);
+  display: none; align-items: center; justify-content: center; z-index: 200; }
+#pinGate.show { display: flex; }
+#pinCard { background: #fff; border-radius: 28px; padding: 28px 34px; text-align: center;
+  border: 5px solid #ffb703; box-shadow: 0 10px 0 rgba(0,0,0,.15); }
+#pinTitle { font-size: 1.4rem; color: #333; margin-bottom: 10px; }
+#pinDots { font-size: 2rem; letter-spacing: 10px; margin-bottom: 14px; color: #ff6b6b; }
+#pinDots.shake { animation: shake .4s; color: #e74c3c; }
+#pinPad { display: grid; grid-template-columns: repeat(3, 74px); gap: 10px; justify-content: center; }
+#pinPad button { font-size: 1.6rem; padding: 14px 0; border-radius: 16px; border: 3px solid #4ecdc4;
+  background: #fff; cursor: pointer; box-shadow: 0 4px 0 #35a8a0; font-family: inherit; }
+#pinPad button:active { transform: translateY(3px); box-shadow: none; }
+
+/* ===== 英雄打怪獸 ===== */
+#battleStage { display: flex; align-items: center; justify-content: space-between;
+  width: 100%; max-width: 640px; position: relative; margin: 6px 0 10px; min-height: 170px; }
+#heroBox img { width: 130px; height: 130px; transition: transform .2s, filter .2s; }
+#heroBox img.charge { transform: scale(1.18); filter: drop-shadow(0 0 18px #ffd60a); }
+#monsterBox { text-align: center; }
+#monsterFace { font-size: 6.5rem; line-height: 1.1; transition: transform .15s, filter .15s; display: inline-block; }
+#monsterFace.hurt { animation: monsterHurt .5s; }
+#monsterFace.taunt { animation: taunt .5s; }
+@keyframes monsterHurt { 20% { transform: translateX(10px) rotate(8deg); filter: hue-rotate(120deg) brightness(1.6); }
+  60% { transform: translateX(-8px); } }
+@keyframes taunt { 30% { transform: scale(1.2) rotate(-8deg); } 70% { transform: scale(1.15) rotate(8deg); } }
+#monsterHp { font-size: 1.3rem; letter-spacing: 2px; margin-bottom: 4px; min-height: 1.6rem; }
+#battleFx { position: absolute; left: 0; right: 0; top: 50%; pointer-events: none; }
+.bolt { position: absolute; font-size: 2.6rem; left: 120px; top: -22px; opacity: 0; }
+.bolt.fly { animation: boltFly .45s ease-in forwards; }
+@keyframes boltFly { 0% { opacity: 1; transform: translateX(0) scale(.8); }
+  100% { opacity: 1; transform: translateX(min(310px, 52vw)) scale(1.3); } }
+#battleSpeaker { font-size: 3rem; background: #fff; border: 5px solid #ffb703; border-radius: 50%;
+  width: 92px; height: 92px; cursor: pointer; box-shadow: 0 6px 0 #e09600; margin-bottom: 14px; }
+#battleSpeaker:active { transform: translateY(3px); box-shadow: 0 2px 0 #e09600; }
+#battleWin { position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+  flex-direction: column; background: rgba(255,255,255,.88); z-index: 100; text-align: center; }
+#battleWin.show { display: flex; }
+#battleWin .big { font-size: clamp(3rem, 10vw, 6rem); animation: pop .6s; }
+#battleWin .msg { font-size: 1.6rem; color: #845ec2; font-weight: bold; margin: 10px 0 20px; }
+
+/* ===== 家長模式 ===== */
+#screen-parent { align-items: stretch; }
+#parentThemes { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+.ptheme-chip { padding: 8px 18px; border-radius: 999px; border: 3px solid #ccc; background: #fff;
+  font-size: 1.05rem; cursor: pointer; font-family: inherit; }
+.ptheme-chip.on { border-color: #4ecdc4; background: #e2fbf9; font-weight: bold; }
+#parentAdd { background: #fff; border-radius: 18px; padding: 14px; margin-bottom: 14px;
+  border: 3px dashed #4ecdc4; }
+#parentAdd .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+#parentAdd input[type=text] { flex: 1; min-width: 130px; padding: 10px; border-radius: 10px;
+  border: 2px solid #ddd; font-size: 1rem; font-family: inherit; }
+#parentList { display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px; }
+.prow { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px;
+  padding: 8px 12px; flex-wrap: wrap; }
+.prow .thumb { width: 52px; height: 52px; object-fit: contain; font-size: 2.4rem; line-height: 52px;
+  text-align: center; }
+.prow .ptxt { flex: 1; min-width: 110px; }
+.prow .ptxt .p-en { font-weight: bold; }
+.prow .ptxt .p-zh { color: #888; font-size: .9rem; }
+.pbtn { font-size: .92rem; padding: 8px 12px; border-radius: 10px; border: 2px solid #4ecdc4;
+  background: #fff; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.pbtn:active { transform: scale(.95); }
+.pbtn.rec { border-color: #ff6b9d; }
+.pbtn.recording { background: #e74c3c; color: #fff; border-color: #e74c3c; animation: pulse 1s infinite; }
+.pbtn.del { border-color: #e74c3c; color: #e74c3c; }
+#parentTools { display: flex; gap: 10px; justify-content: center; padding-bottom: 24px; }
+.badge-custom { font-size: .75rem; background: #ffe9a8; border-radius: 6px; padding: 2px 6px; }
+
 /* ===== RWD ===== */
 /* 手機直式 */
 @media (max-width: 480px) {

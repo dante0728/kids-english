@@ -16,6 +16,7 @@
     <button class="round-btn" id="backBtn" style="display:none">↩️</button>
   </div>
   <div id="topRight">
+    <button class="round-btn" id="parentBtn" title="家長模式">⚙️</button>
     <button class="round-btn" id="bgmBtn" title="背景音樂">🎵</button>
     <div id="stars">⭐ <span id="starCount">0</span></div>
   </div>
@@ -45,6 +46,38 @@
       <span class="emoji">🎤</span><span class="name">跟著唸唸看</span>
       <div class="count">大聲唸出英文</div>
     </div>
+    <div class="menu-card" style="--c:#845ec2" id="modeBattle">
+      <span class="emoji">⚔️</span><span class="name">英雄打怪獸</span>
+      <div class="count">答對就攻擊怪獸！</div>
+    </div>
+  </div>
+</div>
+
+<!-- 遊戲四：英雄打怪獸 -->
+<div class="screen" id="screen-battle">
+  <h1>⚔️ 英雄打怪獸</h1>
+  <div id="battleStage">
+    <div id="heroBox"><img id="heroImg" src="" alt="hero"></div>
+    <div id="battleFx"></div>
+    <div id="monsterBox">
+      <div id="monsterHp"></div>
+      <div id="monsterFace">👾</div>
+    </div>
+  </div>
+  <button id="battleSpeaker">🔊</button>
+  <div class="choice-grid" id="battleChoices"></div>
+</div>
+
+<!-- 家長模式 -->
+<div class="screen" id="screen-parent">
+  <h1>⚙️ 家長模式</h1>
+  <div class="subtitle">新增單字、更換圖片、錄製聲音（存在這台裝置）</div>
+  <div id="parentThemes"></div>
+  <div id="parentAdd"></div>
+  <div id="parentList"></div>
+  <div id="parentTools">
+    <button class="small-btn" id="exportBtn">匯出備份 ⬇️</button>
+    <label class="small-btn pink" style="display:inline-block">匯入備份 ⬆️<input type="file" id="importFile" accept=".json" hidden></label>
   </div>
 </div>
 
@@ -81,6 +114,22 @@
 
 <!-- 例句字幕 -->
 <div id="sentenceBox"><div class="sen-en"></div><div class="sen-zh"></div></div>
+
+<!-- PIN 碼閘門 -->
+<div id="pinGate">
+  <div id="pinCard">
+    <div id="pinTitle">🔒 請輸入通關密碼</div>
+    <div id="pinDots">○○○○</div>
+    <div id="pinPad"></div>
+  </div>
+</div>
+
+<!-- 打怪獸勝利畫面 -->
+<div id="battleWin">
+  <div class="big">🏆⚔️</div>
+  <div class="msg">怪獸被打敗了！英雄獲勝！</div>
+  <button class="small-btn pink" id="battleAgainBtn">再打一隻 ▶</button>
+</div>
 
 <!-- 過關畫面 -->
 <div id="levelClear">
