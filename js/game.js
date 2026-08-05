@@ -232,8 +232,42 @@ function renderHome() {
     s.style.cssText = `left:${DECO_SLOTS[k].x}px;top:${DECO_SLOTS[k].yb - DECO_SIZE}px;font-size:${DECO_SIZE}px`;
     box.appendChild(s);
   });
+  paintRoomHeroes();
   if (window.centerOnPet) centerOnPet();
   updateCurrency();
+}
+
+// 出戰的英雄夥伴也待在家裡陪寵物（世界座標，底部貼地）
+const HERO_SPOTS = [
+  { x: 320, yb: 596 }, { x: 715, yb: 596 }, { x: 845, yb: 578 },
+];
+function paintRoomHeroes() {
+  const box = $('roomHeroes');
+  if (!box) return;
+  box.innerHTML = '';
+  PetState.comp.slice(0, 3).filter(h => Heroes.owns(h)).forEach((h, k) => {
+    const spot = HERO_SPOTS[k];
+    const im = document.createElement('img');
+    im.className = 'room-hero';
+    im.src = `assets/img/hero_full_${h}.svg`;
+    im.alt = heroName(h);
+    im.style.left = spot.x + 'px';
+    im.style.top = (spot.yb - 150) + 'px';
+    im.title = heroName(h);
+    box.appendChild(im);
+  });
+}
+// 學習時夥伴在旁邊加油
+function renderLessonBuddies() {
+  const box = $('lessonBuddies');
+  if (!box) return;
+  const pd = petData(PetState.active);
+  const petSrc = petImgSrc(PetState.active, pd.stage, moodSuffix());
+  let html = petSrc ? `<img class="buddy pet" src="${petSrc}" alt="pet">` : '';
+  PetState.comp.slice(0, 3).filter(h => Heroes.owns(h)).forEach(h => {
+    html += `<img class="buddy" src="assets/img/hero_full_${h}.svg" alt="${heroName(h)}">`;
+  });
+  box.innerHTML = html + '<div class="buddy-say">一起加油！</div>';
 }
 // 點寵物：隨機互動語音
 const TAP_LINES = [0, 1, 2, 3, 4, 5, 6, 10];
@@ -330,6 +364,7 @@ function startLesson(theme, group) {
   }
   lesson = { tasks, idx: 0, key: theme.id + '_g' + group.no, refs: group.refs };
   showScreen('lesson');
+  renderLessonBuddies();
   renderTask();
 }
 function lessonNext() {
@@ -340,6 +375,7 @@ function lessonNext() {
 }
 function renderTask() {
   const token = ++lessonToken;
+  abortRecognize();      // 換題時作廢還在路上的辨識結果
   stopSpeech();
   const { ref, stage } = lesson.tasks[lesson.idx];
   const w = ref.w;
@@ -420,19 +456,32 @@ function finishLesson() {
   playPetLine(11);
 }
 // 簡易一次性語音辨識（課程與冒險共用）
-let onceRec = null;
-function recognizeOnce(target, btn, cb) {
-  if (!SR) { cb(false); return; }
+let onceRec = null, recGen = 0;
+// 換題／換回合時呼叫：中止辨識，並讓還在路上的結果失效（否則會在下一題誤判失敗）
+function abortRecognize() {
+  recGen++;
   if (onceRec) { try { onceRec.abort(); } catch (e) {} onceRec = null; }
-  const rec = new SR();
+}
+function recognizeOnce(target, btn, cb) {
+  // 呼叫當下才取得建構函式（有些瀏覽器較晚才提供，也方便測試替換）
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Rec) { cb(false); return; }
+  abortRecognize();
+  const myGen = recGen;
+  const rec = new Rec();
   rec.lang = 'en-US';
   rec.interimResults = false;
   rec.maxAlternatives = 5;
   onceRec = rec;
+  const label = btn ? btn.textContent : '';
   if (btn) { btn.classList.add('recording'); btn.textContent = '👂 我在聽…'; }
+  let fired = false;
   const done = (ok) => {
-    if (btn) { btn.classList.remove('recording'); btn.textContent = '🎤 開始唸'; }
-    onceRec = null;
+    if (fired) return;
+    fired = true;
+    if (btn) { btn.classList.remove('recording'); btn.textContent = label || '🎤 開始唸'; }
+    if (onceRec === rec) onceRec = null;
+    if (myGen !== recGen) return;      // 已經換題了 → 這次結果作廢
     cb(ok);
   };
   rec.onresult = e => {
@@ -440,6 +489,7 @@ function recognizeOnce(target, btn, cb) {
     done(alts.some(a => a.includes(target.toLowerCase())));
   };
   rec.onerror = () => done(false);
+  rec.onend = () => done(false);
   rec.start();
 }
 
@@ -473,6 +523,7 @@ function startBattleGame() {
 function nextBattleRound() {
   battle.lock = false;
   battle.explainZh = null;
+  abortRecognize();
   ['battleAsk', 'battleBig', 'battleChoices', 'battleControls'].forEach(id => { $(id).innerHTML = ''; });
   const quiz = pickQuizPool(poolFor(currentTheme), battleAsked);
   battle.answer = quiz.answer;
@@ -557,6 +608,7 @@ function battleParty() {
 }
 function battleHit(el) {
   battle.lock = true;
+  abortRecognize();      // 攻擊開始後，還在路上的辨識結果不算數
   if (el) el.classList.add('correct');
   const m = $('monsterFace');
   const ult = battle.energy >= ULT_NEED;      // 集滿氣 → 這一擊是必殺技
@@ -613,9 +665,10 @@ const FOODS = [
   { icon: '🍎', name: '蘋果', cost: 5, h: 1 }, { icon: '🥛', name: '牛奶', cost: 8, h: 2 },
   { icon: '🍰', name: '蛋糕', cost: 15, h: 3 }, { icon: '🍗', name: '大餐', cost: 30, h: 5 },
 ];
-document.querySelectorAll('#careTabs .ptab').forEach(b => { b.onclick = () => renderCare(b.dataset.c); });
+// 四個功能已在首頁各自有入口，這個畫面只顯示被選中的那一個
+const CARE_TITLE = { evolve: '⬆️ 進化', food: '🍎 餵食', deco: '🛋️ 裝飾', comp: '🦸 夥伴' };
 function renderCare(tab) {
-  document.querySelectorAll('#careTabs .ptab').forEach(x => x.classList.toggle('on', x.dataset.c === tab));
+  $('careTitle').textContent = CARE_TITLE[tab] || '⬆️ 進化';
   const p = $('carePanel');
   p.innerHTML = '';
   updateCurrency();
