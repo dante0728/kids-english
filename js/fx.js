@@ -226,6 +226,9 @@ const Fx = (() => {
     tidal:     { name: '海皇之潮', c: ['#1e88e5', '#7fd8ff', '#ffffff'], proj: 'wave', path: 'straight', burst: 'splash', sfx: 'bubble', shake: 11 },
     lantern:   { name: '綠光構裝', c: ['#2a9d3f', '#7ae582', '#ffffff'], proj: 'ring', path: 'straight', burst: 'rings', sfx: 'power', shake: 9 },
     plasma:    { name: '電漿砲', c: ['#7fd8ff', '#c8102e', '#ffffff'], proj: 'orb', path: 'beam', burst: 'boom', sfx: 'robot', shake: 13 },
+    // FOOD超人＋超人力霸王
+    foodpower: { name: '營養能量', c: ['#ff9f1c', '#ffd60a', '#7ae582'], proj: 'star', path: 'straight', burst: 'stars', sfx: 'ding', shake: 8 },
+    specium:   { name: '斯佩修姆光線', c: ['#7fd8ff', '#ffffff', '#4ea8de'], proj: 'orb', path: 'beam', burst: 'boom', sfx: 'zap', shake: 15 },
     // 寵物系
     flame:     { name: '火焰吐息', c: ['#ff9f1c', '#ffd60a', '#e8590c'], proj: 'flame', path: 'straight', burst: 'boom', sfx: 'roar', shake: 10 },
     aqua:      { name: '泡泡水砲', c: ['#1e88e5', '#7fd8ff', '#ffffff'], proj: 'bubbles', path: 'straight', burst: 'splash', sfx: 'bubble', shake: 9 },
@@ -238,7 +241,9 @@ const Fx = (() => {
     'heatvision', 'batarang', 'lasso', 'speedforce', 'tidal', 'lantern', 'plasma',
     // 20-29
     'mandala', 'plasma', 'mandala', 'arrow', 'starburst',
-    'batarang', 'heatvision', 'arrow', 'thunder', 'claw'];
+    'batarang', 'heatvision', 'arrow', 'thunder', 'claw',
+    // 30-35：FOOD超人＋五位超人力霸王
+    'foodpower', 'specium', 'starburst', 'speedforce', 'thunder', 'specium'];
   const PET_SKILL = { dino: 'flame', aqua: 'aqua', leaf: 'leafblade' };
 
   function skillOf(kind, id, stage) {

@@ -254,6 +254,7 @@ function paintRoomHeroes() {
     im.style.left = spot.x + 'px';
     im.style.top = (spot.yb - 150) + 'px';
     im.title = heroName(h);
+    im.onerror = () => im.remove();      // 圖檔缺失時不要留破圖
     box.appendChild(im);
   });
 }
@@ -265,7 +266,8 @@ function renderLessonBuddies() {
   const petSrc = petImgSrc(PetState.active, pd.stage, moodSuffix());
   let html = petSrc ? `<img class="buddy pet" src="${petSrc}" alt="pet">` : '';
   PetState.comp.slice(0, 3).filter(h => Heroes.owns(h)).forEach(h => {
-    html += `<img class="buddy" src="assets/img/hero_full_${h}.svg" alt="${heroName(h)}">`;
+    html += `<img class="buddy" src="assets/img/hero_full_${h}.svg" alt="${heroName(h)}"
+                  onerror="this.remove()">`;
   });
   box.innerHTML = html + '<div class="buddy-say">一起加油！</div>';
 }
@@ -311,8 +313,14 @@ function groupsFor(theme) {
     const no = groupNoOf(theme, i);
     (groups[no] = groups[no] || []).push({ t: theme, i, w });
   });
-  return Object.keys(groups).map(Number).sort((a, b) => a - b)
+  const list = Object.keys(groups).map(Number).sort((a, b) => a - b)
     .map(no => ({ no, refs: groups[no] }));
+  // 尾組只剩 1-2 個字時併入前一組，避免出現超短課程
+  if (list.length > 1 && list[list.length - 1].refs.length <= 2) {
+    const tail = list.pop();
+    list[list.length - 1].refs = list[list.length - 1].refs.concat(tail.refs);
+  }
+  return list;
 }
 const lessonsDone = (() => { try { return JSON.parse(localStorage.getItem('abc-lessons')) || {}; } catch (e) { return {}; } })();
 function renderLearnMenu() {
@@ -511,6 +519,7 @@ function startBattleGame() {
     if (!Heroes.owns(h)) return;
     const im = document.createElement('img');
     im.src = `assets/img/hero_full_${h}.svg`;
+    im.onerror = () => im.remove();
     row.appendChild(im);
   });
   $('monsterFace').textContent = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];

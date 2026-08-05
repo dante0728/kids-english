@@ -349,6 +349,102 @@ HEROES.append(wrap(
     f'<path d="M160 280 Q126 270 94 294 Q132 288 150 302 L160 318 L170 302 Q188 288 226 294 Q194 270 160 280 Z" fill="#2f7fe0" {Sthin}/>'
 ))
 
+# 30 FOOD超人 Food Hero：超大白圓頭、頭頂三凸起、ハ形眉、橘紅大笑嘴、紅衣黃手套
+HEROES.append(wrap(
+    f'<path d="M86 288 Q160 266 234 288 L234 320 L86 320 Z" fill="#e53935" {S}/>' +
+    f'<circle cx="64" cy="298" r="26" fill="#ffd60a" {S}/>' +
+    f'<circle cx="256" cy="298" r="26" fill="#ffd60a" {S}/>' +
+    f'<path d="M138 276 L182 276 L160 308 Z" fill="#ffd60a" {Sthin}/>' +
+    f'<circle cx="118" cy="70" r="26" fill="#f4f6f8" {S}/>' +
+    f'<circle cx="160" cy="52" r="30" fill="#f4f6f8" {S}/>' +
+    f'<circle cx="202" cy="70" r="26" fill="#f4f6f8" {S}/>' +
+    f'<circle cx="160" cy="170" r="100" fill="#dde3e9" {S}/>' +
+    f'<circle cx="160" cy="162" r="95" fill="#f4f6f8"/>' +
+    # ハ 形眉：內側高、外側低（親切表情；反過來會變成生氣臉）
+    f'<path d="M104 120 Q118 100 136 92" fill="none" stroke="#1a1a1a" stroke-width="9" stroke-linecap="round"/>' +
+    f'<path d="M216 120 Q202 100 184 92" fill="none" stroke="#1a1a1a" stroke-width="9" stroke-linecap="round"/>' +
+    f'<ellipse cx="118" cy="154" rx="19" ry="26" fill="#1a1a1a"/>' +
+    f'<circle cx="110" cy="144" r="9" fill="#fff"/>' +
+    f'<ellipse cx="202" cy="154" rx="19" ry="26" fill="#1a1a1a"/>' +
+    f'<circle cx="194" cy="144" r="9" fill="#fff"/>' +
+    f'<path d="M110 196 H210 A50 50 0 0 1 110 196 Z" fill="#f4511e" {S}/>'
+))
+# 31 超人力霸王 Ultraman（初代）：銀白＋紅條紋、頭頂紅色鰭、黃眼、藍色計時燈
+HEROES.append(wrap(
+    f'<path d="M84 268 Q160 244 236 268 L236 320 L84 320 Z" fill="#d7dde3" {S}/>' +
+    f'<path d="M112 258 L96 320 M208 258 L224 320" fill="none" stroke="#c8102e" stroke-width="16" stroke-linecap="round"/>' +
+    f'<ellipse cx="160" cy="292" rx="20" ry="24" fill="#7fd8ff" {Sthin}/>' +
+    f'<ellipse cx="160" cy="158" rx="82" ry="100" fill="#d7dde3" {S}/>' +
+    f'<path d="M160 44 Q182 104 160 150 Q138 104 160 44 Z" fill="#c8102e" {Sthin}/>' +
+    f'<path d="M96 108 Q80 168 104 216" fill="none" stroke="#c8102e" stroke-width="14" stroke-linecap="round"/>' +
+    f'<path d="M224 108 Q240 168 216 216" fill="none" stroke="#c8102e" stroke-width="14" stroke-linecap="round"/>' +
+    f'<ellipse cx="120" cy="152" rx="34" ry="22" fill="#ffd60a" {Sthin} transform="rotate(-16 120 152)"/>' +
+    f'<ellipse cx="200" cy="152" rx="34" ry="22" fill="#ffd60a" {Sthin} transform="rotate(16 200 152)"/>' +
+    f'<path d="M138 214 Q160 226 182 214" fill="none" {Sthin}/>'
+))
+# 32 迪迦 Tiga：銀＋紫紅塊面、尖頭型、藍色三角水晶、黃眼
+HEROES.append(wrap(
+    f'<path d="M84 268 Q160 244 236 268 L236 320 L84 320 Z" fill="#d7dde3" {S}/>' +
+    f'<path d="M84 268 Q110 252 132 248 L122 320 L84 320 Z" fill="#7b4fa8" {Sthin}/>' +
+    f'<path d="M236 268 Q210 252 188 248 L198 320 L236 320 Z" fill="#7b4fa8" {Sthin}/>' +
+    f'<path d="M160 258 L194 320 L126 320 Z" fill="#4cc9f0" {Sthin}/>' +
+    f'<path d="M160 16 L198 96 L122 96 Z" fill="#d7dde3" {S}/>' +
+    f'<ellipse cx="160" cy="162" rx="80" ry="98" fill="#d7dde3" {S}/>' +
+    f'<path d="M160 70 L180 110 L140 110 Z" fill="#c8102e" {Sthin}/>' +
+    f'<path d="M94 116 Q78 172 102 220" fill="none" stroke="#7b4fa8" stroke-width="20" stroke-linecap="round"/>' +
+    f'<path d="M226 116 Q242 172 218 220" fill="none" stroke="#7b4fa8" stroke-width="20" stroke-linecap="round"/>' +
+    f'<ellipse cx="120" cy="158" rx="33" ry="21" fill="#ffd60a" {Sthin} transform="rotate(-18 120 158)"/>' +
+    f'<ellipse cx="200" cy="158" rx="33" ry="21" fill="#ffd60a" {Sthin} transform="rotate(18 200 158)"/>' +
+    f'<path d="M140 218 Q160 230 180 218" fill="none" {Sthin}/>'
+))
+# 33 傑洛 Zero：藍色為主＋紅線、頭頂雙銀彎角、黃眼、紅色計時燈
+HEROES.append(wrap(
+    f'<path d="M84 268 Q160 244 236 268 L236 320 L84 320 Z" fill="#1f6fd0" {S}/>' +
+    f'<path d="M114 256 L100 320 M206 256 L220 320" fill="none" stroke="#c8102e" stroke-width="14" stroke-linecap="round"/>' +
+    f'<ellipse cx="160" cy="292" rx="20" ry="24" fill="#e63946" {Sthin}/>' +
+    f'<path d="M126 84 Q86 26 52 10 Q78 54 100 112 Z" fill="#c0c6cf" {S}/>' +
+    f'<path d="M194 84 Q234 26 268 10 Q242 54 220 112 Z" fill="#c0c6cf" {S}/>' +
+    f'<ellipse cx="160" cy="160" rx="80" ry="98" fill="#d7dde3" {S}/>' +
+    f'<path d="M80 152 Q84 66 160 62 Q236 66 240 152 Q214 100 160 100 Q106 100 80 152 Z" fill="#1f6fd0" {Sthin}/>' +
+    f'<path d="M160 100 L160 138" fill="none" stroke="#c8102e" stroke-width="11" stroke-linecap="round"/>' +
+    f'<path d="M98 178 Q106 206 122 222" fill="none" stroke="#c8102e" stroke-width="11" stroke-linecap="round"/>' +
+    f'<path d="M222 178 Q214 206 198 222" fill="none" stroke="#c8102e" stroke-width="11" stroke-linecap="round"/>' +
+    f'<ellipse cx="120" cy="156" rx="33" ry="21" fill="#ffd60a" {Sthin} transform="rotate(-16 120 156)"/>' +
+    f'<ellipse cx="200" cy="156" rx="33" ry="21" fill="#ffd60a" {Sthin} transform="rotate(16 200 156)"/>' +
+    f'<path d="M140 216 Q160 228 180 216" fill="none" {Sthin}/>'
+))
+# 34 太郎 Taro：紅銀相間、頭頂金色尖角、黃眼、藍色計時燈
+HEROES.append(wrap(
+    f'<path d="M84 268 Q160 244 236 268 L236 320 L84 320 Z" fill="#c8102e" {S}/>' +
+    f'<path d="M116 256 L102 320 M204 256 L218 320" fill="none" stroke="#d7dde3" stroke-width="16" stroke-linecap="round"/>' +
+    f'<ellipse cx="160" cy="292" rx="20" ry="24" fill="#7fd8ff" {Sthin}/>' +
+    f'<path d="M160 6 L188 92 L132 92 Z" fill="#f2a900" {S}/>' +
+    f'<ellipse cx="160" cy="162" rx="80" ry="98" fill="#d7dde3" {S}/>' +
+    f'<path d="M80 154 Q84 68 160 64 Q236 68 240 154 Q214 102 160 102 Q106 102 80 154 Z" fill="#c8102e" {Sthin}/>' +
+    f'<path d="M96 182 Q104 210 120 226" fill="none" stroke="#c8102e" stroke-width="14" stroke-linecap="round"/>' +
+    f'<path d="M224 182 Q216 210 200 226" fill="none" stroke="#c8102e" stroke-width="14" stroke-linecap="round"/>' +
+    f'<ellipse cx="120" cy="158" rx="33" ry="21" fill="#ffd60a" {Sthin} transform="rotate(-16 120 158)"/>' +
+    f'<ellipse cx="200" cy="158" rx="33" ry="21" fill="#ffd60a" {Sthin} transform="rotate(16 200 158)"/>' +
+    f'<path d="M140 218 Q160 230 180 218" fill="none" {Sthin}/>'
+))
+# 35 歐布 Orb：左紅右藍＋銀、胸前金色圓徽、頭頂小金角、黃眼
+HEROES.append(wrap(
+    f'<path d="M84 268 Q160 244 236 268 L236 320 L84 320 Z" fill="#d7dde3" {S}/>' +
+    f'<path d="M84 268 Q122 248 160 246 L160 320 L84 320 Z" fill="#c8102e" {Sthin}/>' +
+    f'<path d="M236 268 Q198 248 160 246 L160 320 L236 320 Z" fill="#1f6fd0" {Sthin}/>' +
+    f'<circle cx="160" cy="290" r="26" fill="#f2a900" {Sthin}/>' +
+    f'<circle cx="160" cy="290" r="12" fill="#fff8c4"/>' +
+    f'<path d="M160 30 L184 92 L136 92 Z" fill="#f2a900" {S}/>' +
+    f'<ellipse cx="160" cy="160" rx="82" ry="100" fill="#d7dde3" {S}/>' +
+    f'<path d="M160 60 A82 100 0 0 0 160 260 Z" fill="#c8102e"/>' +
+    f'<path d="M160 60 A82 100 0 0 1 160 260 Z" fill="#1f6fd0"/>' +
+    f'<ellipse cx="160" cy="160" rx="54" ry="94" fill="#d7dde3"/>' +
+    f'<ellipse cx="160" cy="160" rx="82" ry="100" fill="none" {S}/>' +
+    f'<ellipse cx="120" cy="156" rx="33" ry="21" fill="#ffd60a" {Sthin} transform="rotate(-16 120 156)"/>' +
+    f'<ellipse cx="200" cy="156" rx="33" ry="21" fill="#ffd60a" {Sthin} transform="rotate(16 200 156)"/>' +
+    f'<path d="M140 216 Q160 228 180 216" fill="none" {Sthin}/>'
+))
+
 def main():
     for i, svg in enumerate(HEROES):
         path = os.path.join(OUT, f'heroes_{i}.svg')

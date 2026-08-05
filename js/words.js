@@ -117,6 +117,12 @@ const THEMES = [
       { en: 'Green Arrow', zh: '綠箭俠', emoji: '🎯', sen: 'Green Arrow never misses.', szh: '綠箭俠百發百中。', sfx: 'whoosh' },
       { en: 'Shazam', zh: '沙贊', emoji: '⚡', sen: 'Shazam calls the lightning.', szh: '沙贊呼喚閃電。', sfx: 'zap' },
       { en: 'Nightwing', zh: '夜翼', emoji: '🌙', sen: 'Nightwing jumps in the dark.', szh: '夜翼在黑夜跳躍。', sfx: 'whoosh' },
+      { en: 'Food Hero', zh: 'FOOD超人', emoji: '🍱', sen: 'Food Hero eats healthy food.', szh: 'FOOD超人吃健康的食物。', sfx: 'ding' },
+      { en: 'Ultraman', zh: '超人力霸王', emoji: '🔴', sen: 'Ultraman fights the monster.', szh: '超人力霸王打怪獸。', sfx: 'power' },
+      { en: 'Ultraman Tiga', zh: '迪迦', emoji: '💜', sen: 'Tiga can change his colors.', szh: '迪迦會變顏色。', sfx: 'magic' },
+      { en: 'Ultraman Zero', zh: '傑洛', emoji: '⚡', sen: 'Zero is super fast.', szh: '傑洛超級快。', sfx: 'zap' },
+      { en: 'Ultraman Taro', zh: '太郎', emoji: '🌟', sen: 'Taro has a horn on his head.', szh: '太郎頭上有一根角。', sfx: 'fanfare' },
+      { en: 'Ultraman Orb', zh: '歐布', emoji: '🔵', sen: 'Orb saves the city.', szh: '歐布拯救城市。', sfx: 'rocket' },
     ],
   },
   {

@@ -83,7 +83,7 @@ def eyes(y=130, dx=26, r=8):
 def smile(y=168):
     return f'<path d="M136 {y} Q160 {y+16} 184 {y}" fill="none" {S}/>'
 
-H = [None] * 30
+H = [None] * 36
 
 # 0 鋼鐵人：懸浮＋噴射
 H[0] = svg(
@@ -540,6 +540,115 @@ H[29] = svg(
     + f'<path d="M104 130 L136 138 L132 152 L102 144 Z" fill="#fff" {St}/>'
     + f'<path d="M216 130 L184 138 L188 152 L218 144 Z" fill="#fff" {St}/>'
     + f'<path d="M138 180 L182 180" {S}/>')
+
+# 30 FOOD超人：2 頭身、超大白圓頭＋頭頂三凸起＋ハ形眉＋橘紅大笑嘴＋紅衣黃手套
+H[30] = svg(
+    legs('#e53935', '#20232a')
+    + torso('#e53935',
+        f'<path d="M138 240 L182 240 L160 272 Z" fill="#ffd60a" {St}/>'
+        f'<rect x="116" y="300" width="88" height="18" rx="7" fill="#20232a" {St}/>')
+    + f'<circle cx="80" cy="284" r="27" fill="#ffd60a" {S}/>'
+    + f'<circle cx="240" cy="284" r="27" fill="#ffd60a" {S}/>'
+    + f'<circle cx="118" cy="58" r="24" fill="#f4f6f8" {S}/>'
+    + f'<circle cx="160" cy="42" r="28" fill="#f4f6f8" {S}/>'
+    + f'<circle cx="202" cy="58" r="24" fill="#f4f6f8" {S}/>'
+    + f'<circle cx="160" cy="148" r="96" fill="#dde3e9" {S}/>'
+    + f'<circle cx="160" cy="140" r="91" fill="#f4f6f8"/>'
+    # ハ 形眉：內側高、外側低（親切表情）
+    + f'<path d="M106 104 Q120 84 138 76" fill="none" stroke="#1a1a1a" stroke-width="9" stroke-linecap="round"/>'
+    + f'<path d="M214 104 Q200 84 182 76" fill="none" stroke="#1a1a1a" stroke-width="9" stroke-linecap="round"/>'
+    + f'<ellipse cx="120" cy="136" rx="19" ry="26" fill="#1a1a1a"/>'
+    + f'<circle cx="112" cy="126" r="9" fill="#fff"/>'
+    + f'<ellipse cx="200" cy="136" rx="19" ry="26" fill="#1a1a1a"/>'
+    + f'<circle cx="192" cy="126" r="9" fill="#fff"/>'
+    + f'<path d="M116 176 H204 A44 44 0 0 1 116 176 Z" fill="#f4511e" {S}/>')
+
+# 31 超人力霸王（初代）：雙手交叉發射光線
+H[31] = svg(
+    legs('#d7dde3', '#c8102e')
+    + torso('#d7dde3',
+        f'<path d="M134 232 L124 314 M186 232 L196 314" fill="none" stroke="#c8102e" stroke-width="13" stroke-linecap="round"/>'
+        f'<circle cx="160" cy="290" r="17" fill="#7fd8ff" {St}/>')
+    + f'<ellipse cx="160" cy="126" rx="66" ry="82" fill="#d7dde3" {S}/>'
+    + f'<path d="M160 32 Q179 84 160 122 Q141 84 160 32 Z" fill="#c8102e" {St}/>'
+    + f'<path d="M110 86 Q96 132 114 172" fill="none" stroke="#c8102e" stroke-width="12" stroke-linecap="round"/>'
+    + f'<path d="M210 86 Q224 132 206 172" fill="none" stroke="#c8102e" stroke-width="12" stroke-linecap="round"/>'
+    + f'<ellipse cx="128" cy="122" rx="27" ry="18" fill="#ffd60a" {St} transform="rotate(-16 128 122)"/>'
+    + f'<ellipse cx="192" cy="122" rx="27" ry="18" fill="#ffd60a" {St} transform="rotate(16 192 122)"/>'
+    + f'<path d="M144 174 Q160 184 176 174" fill="none" {St}/>'
+    + arm_left('#d7dde3', -105) + arm_right('#d7dde3', 105)
+    + f'<circle class="glowp" cx="160" cy="226" r="19" fill="#fff8c4" {St}/>')
+
+# 32 迪迦：尖頭型＋紫色塊面＋藍色三角水晶
+H[32] = svg(
+    legs('#d7dde3', '#c8102e')
+    + torso('#d7dde3',
+        f'<path d="M118 226 Q160 214 202 226 L204 252 Q160 266 116 252 Z" fill="#7b4fa8" {St}/>'
+        f'<path d="M132 262 L122 314 M188 262 L198 314" fill="none" stroke="#c8102e" stroke-width="12" stroke-linecap="round"/>'
+        f'<path d="M160 268 L188 316 L132 316 Z" fill="#4cc9f0" {St}/>')
+    + f'<path d="M160 10 L194 78 L126 78 Z" fill="#d7dde3" {S}/>'
+    + f'<ellipse cx="160" cy="128" rx="64" ry="80" fill="#d7dde3" {S}/>'
+    + f'<path d="M160 54 L177 90 L143 90 Z" fill="#c8102e" {St}/>'
+    + f'<path d="M106 90 Q92 134 112 176" fill="none" stroke="#7b4fa8" stroke-width="17" stroke-linecap="round"/>'
+    + f'<path d="M214 90 Q228 134 208 176" fill="none" stroke="#7b4fa8" stroke-width="17" stroke-linecap="round"/>'
+    + f'<ellipse cx="128" cy="126" rx="26" ry="17" fill="#ffd60a" {St} transform="rotate(-18 128 126)"/>'
+    + f'<ellipse cx="192" cy="126" rx="26" ry="17" fill="#ffd60a" {St} transform="rotate(18 192 126)"/>'
+    + f'<path d="M146 176 Q160 186 174 176" fill="none" {St}/>'
+    + arm_left('#7b4fa8', -105) + arm_right('#7b4fa8', 105)
+    + f'<circle class="glowp" cx="160" cy="226" r="19" fill="#fff8c4" {St}/>')
+
+# 33 傑洛：藍色為主＋頭頂雙銀彎角（待機站姿）
+H[33] = svg(
+    legs('#1f6fd0', '#c8102e') + arms('#1f6fd0', 26)
+    + torso('#1f6fd0',
+        f'<path d="M118 226 Q160 214 202 226 L204 260 Q160 274 116 260 Z" fill="#d7dde3" {St}/>'
+        f'<path d="M132 274 L124 316 M188 274 L196 316" fill="none" stroke="#c8102e" stroke-width="11" stroke-linecap="round"/>'
+        f'<circle cx="160" cy="292" r="16" fill="#e63946" {St}/>')
+    + f'<path d="M130 66 Q94 20 66 6 Q88 44 108 92 Z" fill="#c0c6cf" {S}/>'
+    + f'<path d="M190 66 Q226 20 254 6 Q232 44 212 92 Z" fill="#c0c6cf" {S}/>'
+    + f'<ellipse cx="160" cy="128" rx="64" ry="80" fill="#d7dde3" {S}/>'
+    + f'<path d="M98 122 Q100 54 160 50 Q220 54 222 122 Q200 82 160 82 Q120 82 98 122 Z" fill="#1f6fd0" {St}/>'
+    + f'<path d="M160 82 L160 112" fill="none" stroke="#c8102e" stroke-width="10" stroke-linecap="round"/>'
+    + f'<path d="M110 144 Q116 168 130 182" fill="none" stroke="#c8102e" stroke-width="10" stroke-linecap="round"/>'
+    + f'<path d="M210 144 Q204 168 190 182" fill="none" stroke="#c8102e" stroke-width="10" stroke-linecap="round"/>'
+    + f'<ellipse cx="128" cy="126" rx="26" ry="17" fill="#ffd60a" {St} transform="rotate(-16 128 126)"/>'
+    + f'<ellipse cx="192" cy="126" rx="26" ry="17" fill="#ffd60a" {St} transform="rotate(16 192 126)"/>'
+    + f'<path d="M146 176 Q160 186 174 176" fill="none" {St}/>')
+
+# 34 太郎：紅銀相間＋頭頂金色尖角＋交叉光線姿勢
+H[34] = svg(
+    legs('#c8102e', '#d7dde3')
+    + torso('#c8102e',
+        f'<path d="M134 230 L124 314 M186 230 L196 314" fill="none" stroke="#d7dde3" stroke-width="14" stroke-linecap="round"/>'
+        f'<circle cx="160" cy="290" r="17" fill="#7fd8ff" {St}/>')
+    + f'<path d="M160 4 L184 76 L136 76 Z" fill="#f2a900" {S}/>'
+    + f'<ellipse cx="160" cy="128" rx="64" ry="80" fill="#d7dde3" {S}/>'
+    + f'<path d="M98 124 Q100 54 160 50 Q220 54 222 124 Q200 84 160 84 Q120 84 98 124 Z" fill="#c8102e" {St}/>'
+    + f'<path d="M108 148 Q114 172 128 186" fill="none" stroke="#c8102e" stroke-width="13" stroke-linecap="round"/>'
+    + f'<path d="M212 148 Q206 172 192 186" fill="none" stroke="#c8102e" stroke-width="13" stroke-linecap="round"/>'
+    + f'<ellipse cx="128" cy="128" rx="26" ry="17" fill="#ffd60a" {St} transform="rotate(-16 128 128)"/>'
+    + f'<ellipse cx="192" cy="128" rx="26" ry="17" fill="#ffd60a" {St} transform="rotate(16 192 128)"/>'
+    + f'<path d="M146 178 Q160 188 174 178" fill="none" {St}/>'
+    + arm_left('#c8102e', -105) + arm_right('#c8102e', 105)
+    + f'<circle class="glowp" cx="160" cy="226" r="19" fill="#fff8c4" {St}/>')
+
+# 35 歐布：左紅右藍拼接＋胸前金色圓徽（待機站姿）
+H[35] = svg(
+    legs('#d7dde3', '#f2a900') + arm_left('#c8102e', 26) + arm_right('#1f6fd0', -26)
+    + torso('#d7dde3',
+        f'<path d="M118 226 Q139 219 160 218 L160 333 Q134 330 112 320 Z" fill="#c8102e" {St}/>'
+        f'<path d="M202 226 Q181 219 160 218 L160 333 Q186 330 208 320 Z" fill="#1f6fd0" {St}/>'
+        f'<circle cx="160" cy="272" r="26" fill="#f2a900" {St}/>'
+        f'<circle class="glowp" cx="160" cy="272" r="12" fill="#fff8c4"/>')
+    + f'<path d="M160 26 L182 80 L138 80 Z" fill="#f2a900" {S}/>'
+    + f'<ellipse cx="160" cy="128" rx="66" ry="82" fill="#d7dde3" {S}/>'
+    + f'<path d="M160 46 A66 82 0 0 0 160 210 Z" fill="#c8102e"/>'
+    + f'<path d="M160 46 A66 82 0 0 1 160 210 Z" fill="#1f6fd0"/>'
+    + f'<ellipse cx="160" cy="128" rx="44" ry="77" fill="#d7dde3"/>'
+    + f'<ellipse cx="160" cy="128" rx="66" ry="82" fill="none" {S}/>'
+    + f'<ellipse cx="128" cy="124" rx="26" ry="17" fill="#ffd60a" {St} transform="rotate(-16 128 124)"/>'
+    + f'<ellipse cx="192" cy="124" rx="26" ry="17" fill="#ffd60a" {St} transform="rotate(16 192 124)"/>'
+    + f'<path d="M146 176 Q160 186 174 176" fill="none" {St}/>')
 
 def main():
     for i, s in enumerate(H):
