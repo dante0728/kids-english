@@ -574,7 +574,8 @@ $('nextWordBtn').onclick = nextSpeakWord;
 
 /* ================= 遊戲四：英雄打怪獸 ================= */
 const MONSTERS = ['👾', '🐲', '🦖', '👹', '🧌'];
-let battle = { hp: 5, max: 5, answer: null, lock: false };
+const ULT_NEED = 3;                 // 連續答對幾題發動必殺技
+let battle = { hp: 5, max: 5, answer: null, lock: false, energy: 0 };
 const battleAsked = new Set();         // 這一場出過的字（不重複）
 
 function startBattleGame() {
@@ -589,7 +590,18 @@ function startBattleGame() {
   nextBattleRound();
 }
 function updateHp() {
-  $('monsterHp').textContent = '❤️'.repeat(battle.hp) + '🖤'.repeat(battle.max - battle.hp);
+  $('monsterHp').textContent = '❤️'.repeat(Math.max(0, battle.hp)) +
+                               '🖤'.repeat(Math.max(0, battle.max - battle.hp));
+}
+// 必殺技能量槽（答對集氣，滿了下一次答對就發動）
+function updateUltGauge() {
+  const g = $('ultGauge');
+  if (!g) return;
+  const ready = battle.energy >= ULT_NEED;
+  g.textContent = ready ? '⚡⚡⚡ 必殺技準備好了！答對就發動！'
+    : '集氣 ' + '⚡'.repeat(battle.energy) + '⚪'.repeat(ULT_NEED - battle.energy);
+  g.classList.toggle('ready', ready);
+  $('partyRow').classList.toggle('ult-ready', ready);
 }
 function nextBattleRound() {
   battle.lock = false;

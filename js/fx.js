@@ -402,6 +402,94 @@ const Fx = (() => {
     el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   }
 
+  /* ---------- 必殺技：全隊合體攻擊 ---------- */
+  function overlay(on) {
+    let el = document.getElementById('ultDark');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'ultDark';
+      document.body.appendChild(el);
+    }
+    el.classList.toggle('on', !!on);
+  }
+  function ultTitle() {
+    let el = document.getElementById('ultTitle');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'ultTitle';
+      document.body.appendChild(el);
+    }
+    el.textContent = '⚡ 必殺技 ⚡';
+    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  }
+  function flashWhite() {
+    const el = document.getElementById('ultDark');
+    if (!el) return;
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 260);
+  }
+  // 大範圍聚氣：粒子從四面八方吸進角色
+  function chargeBig(sk, at, ms) {
+    for (let i = 0; i < 26; i++) {
+      const a = rand(0, 7), d = rand(70, 150);
+      add({
+        x: at.x + Math.cos(a) * d, y: at.y + Math.sin(a) * d,
+        vx: -Math.cos(a) * d / (ms / 16), vy: -Math.sin(a) * d / (ms / 16),
+        size: rand(4, 10), color: pick(sk.c), shape: pick(['spark', 'star', 'dot']),
+        decay: 1 / (ms / 16), hold: Math.round(i * 0.8), rot: rand(0, 7), spin: rand(-.3, .3),
+      });
+    }
+  }
+  // 終結爆炸
+  function megaBurst(colors, at) {
+    add({ x: at.x, y: at.y, size: 70, color: '#ffffff', shape: 'dot', decay: 0.07 });
+    for (let i = 0; i < 6; i++) {
+      add({ x: at.x, y: at.y, size: 26 + i * 22, color: colors[i % colors.length],
+            shape: 'ring', decay: 0.035, hold: i * 3, shrink: false, spin: 0.02 });
+    }
+    for (let i = 0; i < 120; i++) {
+      const a = rand(0, 7), sp = rand(2.5, 13);
+      add({
+        x: at.x, y: at.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.5,
+        size: rand(4, 13), color: pick(colors), shape: pick(['star', 'spark', 'dot']),
+        decay: rand(0.014, 0.032), grav: 0.17, drag: 0.975,
+        rot: rand(0, 7), spin: rand(-.4, .4),
+      });
+    }
+    shake = 30;
+    start();
+  }
+  function ultimate(list, targetEl, onHit) {
+    const to = centerOf(targetEl);
+    const colors = [...new Set(list.flatMap(m => m.skill.c))];
+    overlay(true);
+    ultTitle();
+    if (window.AudioEngine) AudioEngine.playSfx('power');
+    list.forEach(m => {
+      if (m.el) m.el.classList.add('charge');
+      chargeBig(m.skill, centerOf(m.el), 720);
+    });
+    start();
+    setTimeout(() => {
+      flashWhite();
+      if (window.AudioEngine) AudioEngine.playSfx('fanfare');
+      // 全員同時發射，威力放大
+      list.forEach(m => {
+        const sk = Object.assign({}, m.skill, {
+          power: (m.skill.power || 1) * 2.2, shake: m.skill.shake * 1.5,
+        });
+        projectile(sk, centerOf(m.el), to, 300, () => {});
+      });
+      setTimeout(() => {
+        list.forEach(m => m.el && m.el.classList.remove('charge'));
+        if (window.AudioEngine) AudioEngine.playSfx('rocket');
+        megaBurst(colors, to);
+        if (onHit) onHit();
+        setTimeout(() => overlay(false), 420);
+      }, 330);
+    }, 720);
+  }
+
   /* ---------- 隊伍依序出招 ---------- */
   // list: [{el, skill}]；onDone 在最後一擊命中後呼叫
   function partyAttack(list, targetEl, onDone) {
@@ -421,5 +509,5 @@ const Fx = (() => {
     if (ctx) { setT(); ctx.clearRect(-BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2); }
   }
 
-  return { mount, skillOf, attack, partyAttack, clear, SKILLS };
+  return { mount, skillOf, attack, partyAttack, ultimate, clear, SKILLS };
 })();

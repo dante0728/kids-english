@@ -423,7 +423,9 @@ function startBattleGame() {
   showScreen('battle');
   battle.hp = battle.max = 5;
   battle.lock = false;
+  battle.energy = 0;
   battleAsked.clear();
+  updateUltGauge();
   const pd = petData(PetState.active);
   const src = petImgSrc(PetState.active, pd.stage, moodSuffix());
   $('heroImg').src = src || 'assets/img/pet_dino_0.svg';
@@ -531,20 +533,28 @@ function battleHit(el) {
   battle.lock = true;
   if (el) el.classList.add('correct');
   const m = $('monsterFace');
-  Fx.partyAttack(battleParty(), m, () => {
+  const ult = battle.energy >= ULT_NEED;      // 集滿氣 → 這一擊是必殺技
+  const damage = ult ? 2 : 1;
+
+  const onHit = () => {
     m.classList.add('hurt');
     AudioEngine.playSfx('growl');
     setTimeout(() => m.classList.remove('hurt'), 550);
-    battle.hp--;
+    battle.hp -= damage;
+    if (ult) { battle.energy = 0; } else { battle.energy = Math.min(ULT_NEED, battle.energy + 1); }
     updateHp();
+    updateUltGauge();
     if (battle.hp <= 0) {
       m.textContent = '😵';
-      setTimeout(battleVictory, 700);
+      setTimeout(battleVictory, ult ? 1000 : 700);
     } else {
       playPraise(null);
-      setTimeout(nextBattleRound, 1400);
+      setTimeout(nextBattleRound, ult ? 1800 : 1400);
     }
-  });
+  };
+
+  if (ult) Fx.ultimate(battleParty(), m, onHit);
+  else Fx.partyAttack(battleParty(), m, onHit);
 }
 function battleVictory() {
   AudioEngine.playSfx('fanfare');
@@ -588,10 +598,17 @@ function renderCare(tab) {
   }
   if (tab === 'food') {
     fullnessTick();
-    const note = document.createElement('div');
-    note.style.cssText = 'text-align:center;color:#666;margin-bottom:10px;font-size:1.05rem';
-    note.textContent = `目前飽足度：🍖 ${PetState.hearts}/${FULL_MAX}（${MOOD_INFO[moodOf()].text}）`;
-    p.appendChild(note);
+    const pd = petData(PetState.active);
+    const src = petImgSrc(PetState.active, pd.stage, moodSuffix());
+    const stage = document.createElement('div');
+    stage.id = 'feedStage';
+    stage.innerHTML = `
+      <div id="feedBubble"></div>
+      <div id="feedPet">${src ? `<img id="feedPetImg" src="${src}" alt="pet">`
+                              : '<div style="font-size:5rem">🥚</div>'}</div>
+      <div id="feedGauge"></div>`;
+    p.appendChild(stage);
+    updateFeedGauge();
     const grid = document.createElement('div');
     grid.className = 'care-grid';
     FOODS.forEach(f => {
@@ -600,19 +617,21 @@ function renderCare(tab) {
       c.innerHTML = `<div class="c-icon">${f.icon}</div><div class="c-name">${f.name}</div>
                      <div class="c-price">🪙 ${f.cost}｜🍖 +${f.h}</div>`;
       c.onclick = () => {
+        if (feeding) return;
         if (PetState.hearts >= FULL_MAX) {
           AudioEngine.playSfx('pop');
-          alert('寵物吃太飽了，等牠餓一點再餵吧！');
+          feedSay('我吃不下了啦～肚子好撐！');
           return;
         }
-        if (stars < f.cost) { AudioEngine.playSfx('wrong'); alert('金幣不夠，去冒險賺金幣吧！'); return; }
+        if (stars < f.cost) {
+          AudioEngine.playSfx('wrong');
+          feedSay('金幣不夠，去冒險賺金幣吧！');
+          return;
+        }
         stars -= f.cost;
         localStorage.setItem('abc-stars', stars);
-        PetState.hearts = Math.min(FULL_MAX, PetState.hearts + f.h);
-        savePet();
-        AudioEngine.playSfx('pop');
-        playPetLine(7);
-        renderCare('food');
+        updateCurrency();
+        feedAnim(f, c);
       };
       grid.appendChild(c);
     });
@@ -692,6 +711,86 @@ function renderCare(tab) {
     p.appendChild(grid);
   }
 }
+/* ---- 餵食動畫：食物飛過去 → 寵物咀嚼 → 碎屑噴出 → 飽足度上升 ---- */
+let feeding = false;
+function updateFeedGauge() {
+  const g = $('feedGauge');
+  if (g) g.innerHTML = `🍖 <b>${PetState.hearts}</b> / ${FULL_MAX}　${MOOD_INFO[moodOf()].text}`;
+}
+function feedSay(text) {
+  const b = $('feedBubble');
+  if (!b) return;
+  b.textContent = text;
+  b.classList.add('show');
+  clearTimeout(b._t);
+  b._t = setTimeout(() => b.classList.remove('show'), 2600);
+}
+function crumbs(box, icon) {
+  const r = box.getBoundingClientRect(), pr = $('feedStage').getBoundingClientRect();
+  for (let i = 0; i < 9; i++) {
+    const s = document.createElement('span');
+    s.className = 'crumb';
+    s.textContent = icon;
+    s.style.left = (r.left - pr.left + r.width / 2 - 8) + 'px';
+    s.style.top = (r.top - pr.top + r.height * 0.55) + 'px';
+    s.style.setProperty('--cx', (Math.random() * 160 - 80) + 'px');
+    s.style.setProperty('--cy', (Math.random() * -70 - 20) + 'px');
+    s.style.setProperty('--cr', (Math.random() * 540 - 270) + 'deg');
+    $('feedStage').appendChild(s);
+    setTimeout(() => s.remove(), 800);
+  }
+}
+function feedAnim(f, cardEl) {
+  feeding = true;
+  const petBox = $('feedPet');
+  const pr = petBox.getBoundingClientRect(), cr = cardEl.getBoundingClientRect();
+  // 食物從卡片飛向寵物嘴巴
+  const fly = document.createElement('div');
+  fly.className = 'feed-fly';
+  fly.textContent = f.icon;
+  fly.style.left = (cr.left + cr.width / 2 - 22) + 'px';
+  fly.style.top = (cr.top + cr.height / 2 - 22) + 'px';
+  document.body.appendChild(fly);
+  const dx = (pr.left + pr.width / 2) - (cr.left + cr.width / 2);
+  const dy = (pr.top + pr.height * 0.55) - (cr.top + cr.height / 2);
+  requestAnimationFrame(() => {
+    fly.style.transform = `translate(${dx}px, ${dy}px) scale(.45) rotate(25deg)`;
+  });
+  AudioEngine.playSfx('whoosh');
+  setTimeout(() => {
+    fly.remove();
+    // 咀嚼＋碎屑＋音效
+    petBox.classList.add('eating');
+    AudioEngine.playSfx('pop');
+    setTimeout(() => AudioEngine.playSfx('pop'), 230);
+    setTimeout(() => AudioEngine.playSfx('ding'), 470);
+    crumbs(petBox, f.icon);
+    // 飽足度上升
+    const before = moodOf();
+    PetState.hearts = Math.min(FULL_MAX, PetState.hearts + f.h);
+    PetState.lastTick = Date.now();
+    savePet();
+    const plus = document.createElement('div');
+    plus.className = 'feed-plus';
+    plus.textContent = '🍖 +' + f.h;
+    $('feedStage').appendChild(plus);
+    setTimeout(() => plus.remove(), 1000);
+    setTimeout(() => {
+      petBox.classList.remove('eating');
+      updateFeedGauge();
+      updateCurrency();
+      // 心情改變 → 換成新表情
+      const img = $('feedPetImg');
+      if (img && moodOf() !== before) {
+        img.src = petImgSrc(PetState.active, petData(PetState.active).stage, moodSuffix());
+      }
+      feedSay(PetState.hearts >= FULL_MAX ? '好飽好飽～謝謝你！' : PET_LINES[7]);
+      playPetLine(7);
+      feeding = false;
+    }, 900);
+  }, 620);
+}
+
 function doEvolve() {
   const pd = petData(PetState.active);
   if (!canEvolve(pd)) return;
