@@ -361,16 +361,15 @@ function renderTask() {
     ctl.appendChild(b);
     return b;
   };
+  // 播完不自動跳題：由小朋友自己按「下一步」，才有時間看圖與跟讀
   const playPrompt = () => {
     stopSpeech(); chainId++;
     if (stage === 0) {
       playWordAudio(ref.t, ref.i, () => {
-        if (token !== lessonToken) return;
-        playZhWord(ref, () => { if (token === lessonToken) autoNext(token); });
+        if (token === lessonToken) playZhWord(ref, null);
       });
-    } else if (stage === 2) {
-      if (w.sen) playSentenceAudio(ref.t, ref.i, () => { if (token === lessonToken) autoNext(token); });
-      else playWordAudio(ref.t, ref.i, () => { if (token === lessonToken) autoNext(token); });
+    } else if (stage === 2 && w.sen) {
+      playSentenceAudio(ref.t, ref.i, null);
     } else {
       playWordAudio(ref.t, ref.i, null);
     }
@@ -397,9 +396,6 @@ function playZhWord(ref, cb) {
   const src = ref.w._custom ? null : `assets/voice/${ref.t.id}_${ref.i}_z.mp3`;
   const tts = () => speakZh(ref.w.zh, cb);
   if (src) playFile(src, cb, tts); else tts();
-}
-function autoNext(token) {
-  setTimeout(() => { if (token === lessonToken && lesson) lessonNext(); }, 900);
 }
 function lessonSpeakOk(token) {
   if (token !== lessonToken) return;
