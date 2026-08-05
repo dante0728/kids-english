@@ -30,6 +30,8 @@ const Cloud = (() => {
       heroes: Heroes.data,
       stars,
       days: JSON.parse(localStorage.getItem('abc-days') || '[]'),
+      pet: JSON.parse(localStorage.getItem('abc-pet') || 'null'),
+      lessons: JSON.parse(localStorage.getItem('abc-lessons') || '{}'),
       updated: Date.now(),
     });
   }
@@ -93,6 +95,8 @@ const Cloud = (() => {
     localStorage.setItem('abc-heroes', JSON.stringify(d.heroes || { owned: [0, 1, 13], active: 1 }));
     localStorage.setItem('abc-stars', d.stars || 0);
     localStorage.setItem('abc-days', JSON.stringify(d.days || []));
+    if (d.pet) localStorage.setItem('abc-pet', JSON.stringify(d.pet));
+    if (d.lessons) localStorage.setItem('abc-lessons', JSON.stringify(d.lessons));
     localStorage.setItem('abc-cloud-ts', String(d.updated || Date.now()));
   }
 

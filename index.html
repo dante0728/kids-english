@@ -18,20 +18,71 @@
   <div id="topRight">
     <button class="round-btn" id="parentBtn" title="家長模式">⚙️</button>
     <button class="round-btn" id="bgmBtn" title="背景音樂">🎵</button>
-    <div id="stars">⭐ <span id="starCount">0</span></div>
+    <div id="stars">🪙 <span id="starCount">0</span></div>
+    <div id="hearts">❤️ <span id="heartCount">0</span></div>
   </div>
 </div>
 
-<!-- 主題選單 -->
-<div class="screen active" id="screen-menu">
-  <h1>🌈 ABC 樂園 🌈</h1>
-  <div class="subtitle">選一個主題開始冒險吧！</div>
-  <div class="menu-grid" id="themeGrid"></div>
-  <div id="shopBanner">
-    <span class="sb-icon">🛒</span>
-    <span class="sb-text"><b>英雄商店</b><br><small>用星星解鎖新英雄出戰！</small></span>
-    <span class="sb-stars">⭐ <span id="shopBannerStars">0</span></span>
+<!-- 寵物之家（主畫面） -->
+<div class="screen active" id="screen-home">
+  <div id="petRoom">
+    <div id="roomDeco"></div>
+    <div id="petBubble"></div>
+    <div id="petSprite"><img id="petImg" src="" alt="pet"></div>
   </div>
+  <div id="petStatus">
+    <span id="petName"></span>
+    <span id="petLevel"></span>
+    <div id="expBarBox"><div id="expBar"></div></div>
+  </div>
+  <div id="mainNav">
+    <button class="nav-btn" data-go="learn" style="--c:#4ecdc4"><span>📚</span>學習</button>
+    <button class="nav-btn" data-go="adventure" style="--c:#ff6b6b"><span>⚔️</span>冒險</button>
+    <button class="nav-btn" data-go="care" style="--c:#ffb703"><span>🍎</span>培養</button>
+    <button class="nav-btn" data-go="dex" style="--c:#845ec2"><span>📖</span>圖鑑</button>
+  </div>
+</div>
+
+<!-- 學習：選分組 -->
+<div class="screen" id="screen-learn">
+  <h1>📚 學習</h1>
+  <div class="subtitle">選一組單字，每組 5 個字、20 個小任務！</div>
+  <div id="learnThemes"></div>
+  <div id="learnGroups"></div>
+</div>
+
+<!-- 學習：上課中 -->
+<div class="screen" id="screen-lesson">
+  <div id="lessonProgress"><div id="lessonBar"></div><span id="lessonStep"></span></div>
+  <div id="lessonStage"></div>
+  <div id="lessonCard"></div>
+  <div id="lessonControls"></div>
+</div>
+
+<!-- 冒險：選主題 -->
+<div class="screen" id="screen-menu">
+  <h1>⚔️ 冒險</h1>
+  <div class="subtitle">選一個主題，去打敗怪獸吧！</div>
+  <div class="menu-grid" id="themeGrid"></div>
+</div>
+
+<!-- 培養 -->
+<div class="screen" id="screen-care">
+  <h1>🍎 培養</h1>
+  <div id="careTabs">
+    <button class="ptab on" data-c="evolve">⬆️ 進化</button>
+    <button class="ptab" data-c="food">🍎 食物</button>
+    <button class="ptab" data-c="deco">🛋️ 裝飾</button>
+    <button class="ptab" data-c="comp">🦸 夥伴</button>
+  </div>
+  <div id="carePanel"></div>
+</div>
+
+<!-- 圖鑑 -->
+<div class="screen" id="screen-dex">
+  <h1>📖 寵物圖鑑</h1>
+  <div class="subtitle">看看大家的進化型態，也可以換一隻夥伴！</div>
+  <div id="dexList"></div>
 </div>
 
 <!-- 模式選單 -->
@@ -65,19 +116,23 @@
   <div id="shopGrid"></div>
 </div>
 
-<!-- 遊戲四：英雄打怪獸 -->
+<!-- 冒險：打怪獸 -->
 <div class="screen" id="screen-battle">
-  <h1>⚔️ 英雄打怪獸</h1>
+  <h1>⚔️ 打怪獸</h1>
   <div id="battleStage">
-    <div id="heroBox"><img id="heroImg" src="" alt="hero"></div>
+    <div id="heroBox"><img id="heroImg" src="" alt="pet"></div>
+    <div id="companionRow"></div>
     <div id="battleFx"></div>
     <div id="monsterBox">
       <div id="monsterHp"></div>
       <div id="monsterFace">👾</div>
     </div>
   </div>
+  <div id="battleAsk"></div>
+  <div id="battleBig"></div>
   <button id="battleSpeaker">🔊</button>
   <div class="choice-grid" id="battleChoices"></div>
+  <div id="battleControls" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center"></div>
 </div>
 
 <!-- 家長模式（四個分頁：教材 / 總覽 / 報告 / 系統） -->
@@ -85,6 +140,7 @@
   <h1>⚙️ 家長模式</h1>
   <div id="ptabs">
     <button class="ptab on" data-p="edit">📝 教材編輯</button>
+    <button class="ptab" data-p="pets">🐾 寵物</button>
     <button class="ptab" data-p="overview">🗂 資料總覽</button>
     <button class="ptab" data-p="report">📊 學習報告</button>
     <button class="ptab" data-p="system">☁️ 系統</button>
@@ -92,8 +148,16 @@
 
   <div class="ppanel" id="panel-edit">
     <div id="parentThemes"></div>
+    <div style="text-align:center;margin-bottom:10px">
+      <button class="pbtn" id="groupEditBtn">🧩 編輯學習分組</button>
+    </div>
+    <div id="groupEditor" style="display:none"></div>
     <div id="parentAdd"></div>
     <div id="parentList"></div>
+  </div>
+
+  <div class="ppanel" id="panel-pets" style="display:none">
+    <div id="petEditor"></div>
   </div>
 
   <div class="ppanel" id="panel-overview" style="display:none">
@@ -193,9 +257,12 @@
 
 <div id="confetti"></div>
 
+<div id="evolveFlash"></div>
+
 <script src="js/words.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/cloud.js"></script>
 <script src="js/app.js"></script>
+<script src="js/game.js"></script>
 </body>
 </html>

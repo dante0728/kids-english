@@ -221,6 +221,114 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 .rp-chip.good { background: #d9ffe5; color: #1a7a3a; }
 .rp-chip.bad { background: #ffe0e0; color: #b03030; }
 
+/* ===== 寵物之家 ===== */
+#hearts { font-size: 1.2rem; background: #fff; border-radius: 999px; padding: 8px 16px;
+  border: 4px solid #ff6b9d; box-shadow: 0 4px 0 #d14b7d; }
+#petRoom { position: relative; width: 100%; max-width: 560px; height: min(46vh, 340px);
+  background: linear-gradient(180deg, #cdeffd 0%, #e8fbf1 62%, #ffe8b3 62%, #ffd98a 100%);
+  border: 5px solid #b98a3e; border-radius: 26px; overflow: hidden; }
+#petSprite { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%);
+  cursor: pointer; transition: transform .15s; }
+#petSprite:active { transform: translateX(-50%) scale(.94); }
+#petSprite img { width: min(46vw, 210px); height: min(46vw, 210px); }
+#petSprite.eat { animation: petEat .8s; }
+@keyframes petEat { 25% { transform: translateX(-50%) scale(1.1, .9); } 60% { transform: translateX(-50%) scale(.95, 1.06); } }
+#petSprite.happy { animation: petHappy .7s; }
+@keyframes petHappy { 30% { transform: translateX(-50%) translateY(-24px); } }
+#petBubble { position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  background: #fff; border: 3px solid #444; border-radius: 16px; padding: 8px 16px;
+  font-size: 1.05rem; color: #333; max-width: 86%; text-align: center; opacity: 0;
+  transition: opacity .25s; pointer-events: none; z-index: 5; }
+#petBubble.show { opacity: 1; }
+#roomDeco { position: absolute; inset: 0; pointer-events: none; }
+.deco-item { position: absolute; font-size: 2.4rem; }
+#petStatus { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 560px;
+  background: #fff; border-radius: 999px; padding: 8px 18px; margin-top: 10px;
+  box-shadow: 0 4px 0 rgba(0,0,0,.12); }
+#petName { font-weight: bold; color: #333; }
+#petLevel { color: #845ec2; font-weight: bold; white-space: nowrap; }
+#expBarBox { flex: 1; height: 14px; background: #eee; border-radius: 999px; overflow: hidden; }
+#expBar { height: 100%; width: 0%; background: linear-gradient(90deg, #ffd60a, #ff9f1c);
+  border-radius: 999px; transition: width .5s; }
+#mainNav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%;
+  max-width: 560px; margin-top: 14px; }
+.nav-btn { font-family: inherit; font-size: 1.15rem; font-weight: bold; color: #333;
+  background: #fff; border: 4px solid var(--c); border-radius: 20px; padding: 12px 4px;
+  cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,.15); transition: transform .12s;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.nav-btn span { font-size: 1.9rem; }
+.nav-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.15); }
+
+/* ===== 學習選單 ===== */
+#learnThemes { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+#learnGroups { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px; width: 100%; padding-bottom: 20px; }
+.group-card { background: #fff; border-radius: 18px; padding: 14px; border: 4px solid #4ecdc4;
+  cursor: pointer; box-shadow: 0 5px 0 rgba(0,0,0,.12); transition: transform .12s; }
+.group-card:active { transform: scale(.97); }
+.group-card .g-title { font-weight: bold; color: #333; font-size: 1.1rem; }
+.group-card .g-done { color: #2ecc71; font-size: .9rem; }
+.group-card .g-thumbs { display: flex; gap: 4px; margin-top: 8px; }
+.group-card .g-thumbs img, .group-card .g-thumbs span { width: 38px; height: 38px;
+  object-fit: contain; font-size: 1.7rem; line-height: 38px; text-align: center; }
+
+/* ===== 課程（20 步） ===== */
+#screen-lesson { justify-content: flex-start; }
+#lessonProgress { width: 100%; max-width: 560px; display: flex; align-items: center; gap: 10px;
+  background: #fff; border-radius: 999px; padding: 6px 14px; margin-bottom: 8px; }
+#lessonBar { flex: 1; height: 14px; background: #eee; border-radius: 999px; overflow: hidden; position: relative; }
+#lessonBar::after { content: ''; position: absolute; inset: 0; width: var(--p, 0%);
+  background: linear-gradient(90deg, #4ecdc4, #2ecc71); border-radius: 999px; transition: width .4s; }
+#lessonStep { font-weight: bold; color: #555; white-space: nowrap; }
+#lessonStage { font-size: 1.2rem; color: #845ec2; font-weight: bold; margin-bottom: 8px; }
+#lessonCard { background: #fff; border-radius: 24px; padding: 20px 26px; text-align: center;
+  box-shadow: 0 8px 0 rgba(0,0,0,.12); max-width: 480px; width: 92%; }
+#lessonCard .pic img { width: 150px; height: 150px; }
+#lessonCard .l-en { font-size: 2rem; font-weight: bold; color: #333; }
+#lessonCard .l-zh { font-size: 1.3rem; color: #888; }
+#lessonCard .l-sen { font-size: 1.1rem; color: #666; margin-top: 6px; }
+#lessonControls { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+
+/* ===== 培養 ===== */
+#careTabs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+#carePanel { width: 100%; max-width: 720px; padding-bottom: 24px; }
+.care-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.care-card { background: #fff; border-radius: 18px; padding: 14px 10px; text-align: center;
+  border: 4px solid #ddd; cursor: pointer; box-shadow: 0 5px 0 rgba(0,0,0,.12); }
+.care-card:active { transform: scale(.96); }
+.care-card .c-icon { font-size: 2.6rem; }
+.care-card .c-name { font-weight: bold; color: #333; margin-top: 4px; }
+.care-card .c-price { color: #b8860b; margin-top: 2px; }
+.care-card.owned { border-color: #4ecdc4; }
+.care-card.placed { border-color: #ffb703; background: #fff8e2; }
+.care-card.sel { border-color: #ff6b9d; background: #ffeef5; }
+#evolveBox { text-align: center; background: #fff; border-radius: 22px; padding: 20px;
+  box-shadow: 0 6px 0 rgba(0,0,0,.12); }
+#evolveBox img { width: 200px; height: 200px; }
+#evolveFlash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none;
+  z-index: 150; transition: opacity .3s; }
+#evolveFlash.on { opacity: 1; }
+
+/* ===== 圖鑑 ===== */
+#dexList { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
+.dex-row { background: #fff; border-radius: 20px; padding: 14px; box-shadow: 0 5px 0 rgba(0,0,0,.12); }
+.dex-row.active-pet { border: 4px solid #ffb703; }
+.dex-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.dex-head b { font-size: 1.15rem; }
+.dex-stages { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+.dex-stage { text-align: center; }
+.dex-stage img { width: 76px; height: 76px; object-fit: contain; }
+.dex-stage.locked img { filter: grayscale(1) brightness(.4); }
+.dex-stage .ds-name { font-size: .8rem; color: #666; }
+.dex-stage.locked .ds-name { color: #bbb; }
+
+/* 打怪獸：夥伴列與口說題 */
+#companionRow { position: absolute; left: 4px; bottom: 4px; display: flex; gap: 2px; }
+#companionRow img { width: 44px; height: 60px; object-fit: contain; }
+#battleAsk { text-align: center; margin-bottom: 10px; min-height: 2rem; font-size: 1.15rem; color: #555; }
+#battleBig { text-align: center; }
+#battleBig .pic img { width: 150px; height: 150px; }
+
 /* ===== 家長模式分頁 ===== */
 #ptabs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 4px 0 14px; }
 .ptab { font-size: 1rem; padding: 10px 16px; border-radius: 14px 14px 0 0; border: 3px solid #ddd;

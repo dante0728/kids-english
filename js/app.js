@@ -350,14 +350,20 @@ function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $('screen-' + name).classList.add('active');
   currentScreen = name;
-  $('backBtn').style.display = name === 'menu' ? 'none' : '';
-  if (name === 'menu') $('shopBannerStars').textContent = stars;
+  $('backBtn').style.display = name === 'home' ? 'none' : '';
 }
-$('homeBtn').onclick = () => { stopSpeech(); stopRecognition(); showScreen('menu'); };
+$('homeBtn').onclick = () => { stopSpeech(); stopRecognition(); goHome(); };
 $('backBtn').onclick = () => {
   stopSpeech(); stopRecognition();
-  showScreen(['mode', 'parent', 'shop'].includes(currentScreen) ? 'menu' : 'mode');
+  const map = { learn: 'home', lesson: 'learn', menu: 'home', battle: 'menu',
+                care: 'home', dex: 'home', parent: 'home', shop: 'care', mode: 'menu' };
+  const to = map[currentScreen] || 'home';
+  if (to === 'home') goHome(); else showScreen(to);
 };
+function goHome() {
+  showScreen('home');
+  if (typeof renderHome === 'function') renderHome();
+}
 $('parentBtn').onclick = () => {
   stopSpeech(); stopRecognition();
   showPin('👨‍👩‍👧 家長模式密碼', () => { openParent(); });
@@ -379,12 +385,12 @@ function renderThemeMenu() {
     c.innerHTML = `<span class="emoji">${t.emoji}</span><span class="name">${t.name}</span>
                    <div class="count">${t.id === 'mix' ? '全部單字混著玩！' : count + ' 個單字'}</div>`;
     c.onclick = () => {
-      if (count === 0) { alert('「' + t.name + '」還沒有單字，請先到家長模式新增！'); return; }
-      openTheme(t);
+      if (count < 4) { alert('「' + t.name + '」至少要 4 個單字才能冒險，請先到家長模式新增！'); return; }
+      currentTheme = t;
+      startBattleGame();          // 冒險：選了主題直接開打
     };
     grid.appendChild(c);
   });
-  $('shopBannerStars').textContent = stars;
 }
 function openTheme(t) {
   currentTheme = t;
@@ -392,11 +398,6 @@ function openTheme(t) {
   showScreen('mode');
 }
 renderThemeMenu();
-// 英雄商店入口（獨立橫幅，與主題分開）
-const openShop = () => { showScreen('shop'); renderShop(); AudioEngine.playSfx('jingle'); };
-$('shopBanner').onclick = openShop;
-$('stars').style.cursor = 'pointer';
-$('stars').onclick = () => { if (currentScreen === 'menu') openShop(); };
 $('modeCards').onclick = () => startCardsGame();
 $('modeListen').onclick = () => {
   if (poolFor(currentTheme).length < 4) { alert('這個類別至少要 4 個單字才能玩聽聽看喔！'); return; }
@@ -667,11 +668,12 @@ function openParent() {
 }
 // 分頁切換：教材編輯 / 資料總覽 / 學習報告 / 系統
 function switchPTab(p) {
-  document.querySelectorAll('.ptab').forEach(x => x.classList.toggle('on', x.dataset.p === p));
-  ['edit', 'overview', 'report', 'system'].forEach(x => {
+  document.querySelectorAll('#ptabs .ptab').forEach(x => x.classList.toggle('on', x.dataset.p === p));
+  ['edit', 'pets', 'overview', 'report', 'system'].forEach(x => {
     $('panel-' + x).style.display = (x === p) ? '' : 'none';
   });
   if (p === 'edit') { renderParentThemes(); renderParentAdd(); renderParentList(); }
+  if (p === 'pets' && typeof renderPetEditor === 'function') renderPetEditor();
   if (p === 'overview') renderOverview();
   if (p === 'report') renderReport();
   if (p === 'system') renderCloudBox();
@@ -1029,6 +1031,8 @@ $('exportBtn').onclick = () => {
   const bundle = {
     custom: Custom.data, mem: Mem.data, heroes: Heroes.data, stars,
     days: JSON.parse(localStorage.getItem('abc-days') || '[]'),
+    pet: JSON.parse(localStorage.getItem('abc-pet') || 'null'),
+    lessons: JSON.parse(localStorage.getItem('abc-lessons') || '{}'),
   };
   const blob = new Blob([JSON.stringify(bundle)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -1051,6 +1055,8 @@ $('importFile').onchange = (e) => {
         if (d.heroes) { Heroes.data = d.heroes; Heroes.save(); }
         if (typeof d.stars === 'number') { stars = d.stars; localStorage.setItem('abc-stars', stars); $('starCount').textContent = stars; }
         if (d.days) localStorage.setItem('abc-days', JSON.stringify(d.days));
+        if (d.pet) localStorage.setItem('abc-pet', JSON.stringify(d.pet));
+        if (d.lessons) localStorage.setItem('abc-lessons', JSON.stringify(d.lessons));
       } else throw new Error('格式不對');
       alert('匯入成功！'); openParent();
     } catch (err) { alert('匯入失敗：' + err.message); }

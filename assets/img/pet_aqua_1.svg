@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320"><style>
+.bob{animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.rocking{animation:rocking 2s ease-in-out infinite;transform-origin:160px 290px}
+@keyframes rocking{25%{transform:rotate(8deg)}75%{transform:rotate(-8deg)}}
+.blink{animation:blink 3s step-end infinite}
+@keyframes blink{0%,91%,96%,100%{opacity:1}92%,95%{opacity:0}}
+.glowp{animation:glowp 1.3s ease-in-out infinite}
+@keyframes glowp{50%{opacity:.3}}
+.wag{animation:wag 1.5s ease-in-out infinite}
+@keyframes wag{50%{transform:rotate(12deg)}}
+.rise{animation:rise 2.6s linear infinite}
+@keyframes rise{to{transform:translateY(-80px);opacity:0}}
+</style><ellipse cx="160" cy="298" rx="80" ry="14" fill="#1a1a1a" opacity=".12"/><g class="bob"><ellipse cx="84" cy="222" rx="16" ry="40" fill="#1971c2" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(20 84 222)"/><ellipse cx="236" cy="222" rx="16" ry="40" fill="#1971c2" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-20 236 222)"/><rect x="112" y="268" width="44" height="24" rx="12" fill="#ff9f1c" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="164" y="268" width="44" height="24" rx="12" fill="#ff9f1c" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="160" cy="182" rx="88" ry="102" fill="#1971c2" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="160" cy="208" rx="56" ry="70" fill="#fff" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M96 118 Q128 96 160 100 Q192 96 224 118 Q206 74 160 72 Q114 74 96 118 Z" fill="#4dabf7" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><g class="blink"><circle cx="130" cy="136" r="11" fill="#1a1a1a"/><circle cx="190" cy="136" r="11" fill="#1a1a1a"/><circle cx="133" cy="133" r="3" fill="#fff"/><circle cx="193" cy="133" r="3" fill="#fff"/></g><path d="M146 160 L174 160 L160 178 Z" fill="#ff9f1c" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="104" cy="164" r="10" fill="#ffb3b3" opacity=".8"/><circle cx="216" cy="164" r="10" fill="#ffb3b3" opacity=".8"/></g></svg>
