@@ -676,7 +676,10 @@ function switchPTab(p) {
   if (p === 'pets' && typeof renderPetEditor === 'function') renderPetEditor();
   if (p === 'overview') renderOverview();
   if (p === 'report') renderReport();
-  if (p === 'system') renderCloudBox();
+  if (p === 'system') {
+    renderCloudBox();
+    if (typeof renderProgressCtrl === 'function') renderProgressCtrl();
+  }
 }
 document.querySelectorAll('.ptab').forEach(b => { b.onclick = () => switchPTab(b.dataset.p); });
 

@@ -235,7 +235,7 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 .furn { position: absolute; line-height: 1; user-select: none; }
 #panHint { position: absolute; right: 10px; bottom: 8px; background: rgba(255,255,255,.85);
   border-radius: 999px; padding: 4px 12px; font-size: .8rem; color: #888; pointer-events: none; }
-#petSprite { position: absolute; left: 480px; bottom: 60px;
+#petSprite { position: absolute; left: 490px; bottom: 55px;
   cursor: pointer; transition: transform .15s; }
 #petSprite:active { transform: scale(.94); }
 #petSprite img { width: 200px; height: 200px; }

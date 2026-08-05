@@ -86,18 +86,19 @@ function gainExp(n) {
 
 /* ================= 寵物之家（大房間可拖曳參觀） ================= */
 const WORLD = { w: 1200, h: 640 };
-// 內建家具（世界座標）
+// 內建家具（世界座標，yb = 底部貼地位置；地板線約 y=400）
 const FURNITURE = [
-  { icon: '🚪', x: 18, y: 130, s: 110 }, { icon: '🛏️', x: 70, y: 330, s: 120 },
-  { icon: '🪟', x: 330, y: 80, s: 96 }, { icon: '🕰️', x: 560, y: 60, s: 64 },
-  { icon: '🖼️', x: 710, y: 95, s: 74 }, { icon: '🛋️', x: 920, y: 330, s: 112 },
-  { icon: '📚', x: 1075, y: 200, s: 100 }, { icon: '🪑', x: 250, y: 400, s: 76 },
-  { icon: '🧺', x: 1115, y: 500, s: 60 },
+  { icon: '🚪', x: 30, yb: 435, s: 175 }, { icon: '🛏️', x: 185, yb: 500, s: 145 },
+  { icon: '🪟', x: 380, yb: 235, s: 115 }, { icon: '🕰️', x: 610, yb: 130, s: 70 },
+  { icon: '🖼️', x: 745, yb: 225, s: 85 }, { icon: '🛋️', x: 860, yb: 505, s: 130 },
+  { icon: '🗄️', x: 1055, yb: 460, s: 135 }, { icon: '🪑', x: 320, yb: 545, s: 85 },
+  { icon: '🧺', x: 1125, yb: 600, s: 62 },
 ];
-// 買來的裝飾品的擺放位置（世界座標）
+// 買來的裝飾品的擺放位置（世界座標，底部貼地）
+const DECO_SIZE = 52;
 const DECO_SLOTS = [
-  { x: 200, y: 500 }, { x: 400, y: 530 }, { x: 660, y: 520 },
-  { x: 830, y: 490 }, { x: 1000, y: 545 }, { x: 480, y: 130 },
+  { x: 255, yb: 585 }, { x: 445, yb: 570 }, { x: 710, yb: 580 },
+  { x: 900, yb: 600 }, { x: 1010, yb: 555 }, { x: 110, yb: 600 },
 ];
 // 房間拖曳（拖了就不觸發點寵物）
 let roomMoved = false;
@@ -125,7 +126,7 @@ let roomMoved = false;
   room.addEventListener('pointerup', end);
   room.addEventListener('pointercancel', end);
   window.centerOnPet = () => {   // 進首頁時把視角對準寵物
-    px = room.clientWidth / 2 - 580; py = room.clientHeight - WORLD.h;
+    px = room.clientWidth / 2 - 590; py = room.clientHeight - WORLD.h;
     apply();
   };
 })();
@@ -152,7 +153,7 @@ function renderHome() {
       const s = document.createElement('span');
       s.className = 'furn';
       s.textContent = f.icon;
-      s.style.cssText = `left:${f.x}px;top:${f.y}px;font-size:${f.s}px`;
+      s.style.cssText = `left:${f.x}px;top:${f.yb - f.s}px;font-size:${f.s}px`;
       fb.appendChild(s);
     });
   }
@@ -165,8 +166,7 @@ function renderHome() {
     const s = document.createElement('span');
     s.className = 'deco-item';
     s.textContent = item.icon;
-    s.style.left = DECO_SLOTS[k].x + 'px';
-    s.style.top = DECO_SLOTS[k].y + 'px';
+    s.style.cssText = `left:${DECO_SLOTS[k].x}px;top:${DECO_SLOTS[k].yb - DECO_SIZE}px;font-size:${DECO_SIZE}px`;
     box.appendChild(s);
   });
   if (window.centerOnPet) centerOnPet();
@@ -822,6 +822,140 @@ function renderGroupEditor() {
       Custom.save();
     };
   });
+}
+
+/* ================= 家長：進度控制 ================= */
+function renderProgressCtrl() {
+  const box = $('progressBox');
+  if (!box) return;
+  const petOpts = petList().map(p =>
+    `<option value="${p.id}">${p.names[0]} 系列（Lv.${petLevel(petData(p.id).exp)}）</option>`).join('');
+  box.innerHTML = `
+    <div style="background:#fff;border-radius:18px;padding:14px;margin-bottom:14px;border:3px dashed #e09600">
+      <b>🎮 進度控制</b>
+      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
+        🪙 金幣 <input type="number" id="pcCoins" value="${stars}" min="0" style="width:90px;padding:8px;border-radius:8px;border:2px solid #ddd">
+        ❤️ 愛心 <input type="number" id="pcHearts" value="${PetState.hearts}" min="0" style="width:90px;padding:8px;border-radius:8px;border:2px solid #ddd">
+        <button class="pbtn" id="pcMoneySave">套用</button>
+      </div>
+      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
+        🐾 <select id="pcPet" style="padding:8px;border-radius:8px;border:2px solid #ddd">${petOpts}</select>
+        等級 <input type="number" id="pcLevel" min="1" max="40" style="width:70px;padding:8px;border-radius:8px;border:2px solid #ddd">
+        型態 <select id="pcStage" style="padding:8px;border-radius:8px;border:2px solid #ddd">
+          <option value="0">第1型</option><option value="1">第2型</option>
+          <option value="2">第3型</option><option value="3">第4型</option></select>
+        <button class="pbtn" id="pcPetSave">套用</button>
+      </div>
+      <div style="margin-top:10px;color:#666;font-size:.9rem">🛋️ 裝飾擁有狀況（點擊切換）</div>
+      <div id="pcDeco" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
+      <div style="margin-top:10px;color:#666;font-size:.9rem">🦸 英雄擁有狀況（點擊切換）</div>
+      <div id="pcHeroes" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
+      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <button class="pbtn del" id="pcClearLearn">🧹 清除學習紀錄</button>
+        <button class="pbtn del" id="pcResetGame">♻️ 重置遊戲進度</button>
+        <button class="pbtn del" id="pcResetAll" style="font-weight:bold">⚠️ 恢復出廠（含自訂教材）</button>
+      </div>
+      <div style="color:#999;font-size:.8rem;margin-top:6px">重置後會自動同步到雲端；若只想還原單一裝置，請先停用雲端同步。</div>
+    </div>`;
+  // 帶入目前選中寵物的等級/型態
+  const syncPetInputs = () => {
+    const pd = petData($('pcPet').value);
+    $('pcLevel').value = petLevel(pd.exp);
+    $('pcStage').value = pd.stage;
+  };
+  syncPetInputs();
+  $('pcPet').onchange = syncPetInputs;
+  $('pcMoneySave').onclick = () => {
+    stars = Math.max(0, Number($('pcCoins').value) || 0);
+    localStorage.setItem('abc-stars', stars);
+    PetState.hearts = Math.max(0, Number($('pcHearts').value) || 0);
+    savePet();
+    updateCurrency();
+    AudioEngine.playSfx('ding');
+  };
+  $('pcPetSave').onclick = () => {
+    const pd = petData($('pcPet').value);
+    const lv = Math.min(40, Math.max(1, Number($('pcLevel').value) || 1));
+    pd.exp = (lv - 1) * 10;
+    pd.stage = Number($('pcStage').value);
+    savePet();
+    AudioEngine.playSfx('ding');
+    renderProgressCtrl();
+  };
+  // 裝飾切換
+  const decoBox = $('pcDeco');
+  DECO_ITEMS.forEach(item => {
+    const b = document.createElement('button');
+    const owned = PetState.deco.owned.includes(item.id);
+    b.className = 'ptheme-chip' + (owned ? ' on' : '');
+    b.textContent = item.icon + ' ' + item.name;
+    b.onclick = () => {
+      if (owned) {
+        PetState.deco.owned = PetState.deco.owned.filter(x => x !== item.id);
+        PetState.deco.placed = PetState.deco.placed.filter(x => x !== item.id);
+      } else {
+        PetState.deco.owned.push(item.id);
+      }
+      savePet();
+      renderProgressCtrl();
+    };
+    decoBox.appendChild(b);
+  });
+  // 英雄切換
+  const heroBox = $('pcHeroes');
+  heroTheme().words.forEach((w, i) => {
+    const b = document.createElement('button');
+    const owned = Heroes.owns(i);
+    b.className = 'ptheme-chip' + (owned ? ' on' : '');
+    b.textContent = w.zh;
+    b.onclick = () => {
+      if (owned) {
+        Heroes.data.owned = Heroes.data.owned.filter(x => x !== i);
+        PetState.comp = PetState.comp.filter(x => x !== i);
+        savePet();
+      } else {
+        Heroes.data.owned.push(i);
+      }
+      Heroes.save();
+      renderProgressCtrl();
+    };
+    heroBox.appendChild(b);
+  });
+  $('pcClearLearn').onclick = () => {
+    if (!confirm('清除所有學習紀錄（單字熟練度、連續天數、課程完成次數）？')) return;
+    localStorage.removeItem('abc-mem');
+    localStorage.removeItem('abc-days');
+    localStorage.removeItem('abc-lessons');
+    Mem.data = {};
+    Object.keys(lessonsDone).forEach(k => delete lessonsDone[k]);
+    Cloud.schedule();
+    alert('已清除');
+  };
+  const resetGame = (includeCustom) => {
+    ['abc-pet', 'abc-stars', 'abc-mem', 'abc-days', 'abc-lessons', 'abc-heroes']
+      .forEach(k => localStorage.removeItem(k));
+    if (includeCustom) localStorage.removeItem('abc-custom');
+    // 重置後立刻覆蓋雲端（否則開頁又會拉回舊進度）
+    if (Cloud.enabled() && Cloud.getCode()) {
+      Custom.data = includeCustom ? { words: {}, over: {} } : Custom.data;
+      Mem.data = {};
+      Heroes.data = { owned: [0, 1, 13], active: 1 };
+      Object.assign(PetState, { active: 'dino', pets: {}, hearts: 0,
+        deco: { owned: [], placed: [] }, comp: [1] });
+      stars = 0;
+      Cloud.push().then(() => location.reload());
+    } else {
+      location.reload();
+    }
+  };
+  $('pcResetGame').onclick = () => {
+    if (confirm('重置全部遊戲進度（寵物/金幣/英雄/學習紀錄）？自訂教材會保留。') &&
+        confirm('真的確定嗎？此動作無法復原！')) resetGame(false);
+  };
+  $('pcResetAll').onclick = () => {
+    if (confirm('恢復出廠：連自訂單字、圖片、錄音、寵物設定也會全部刪除！確定？') &&
+        confirm('真的確定嗎？此動作無法復原！')) resetGame(true);
+  };
 }
 
 /* ================= 簡易繪圖板（家長模式：畫單字圖/寵物造型） ================= */
