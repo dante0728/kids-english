@@ -21,9 +21,33 @@ const PET_LINES = [
 const PetState = (() => {
   let d;
   try { d = JSON.parse(localStorage.getItem('abc-pet')); } catch (e) {}
-  if (!d) d = { active: 'dino', pets: {}, hearts: 0, deco: { owned: [], placed: [] }, comp: [1] };
+  if (!d) d = { active: 'dino', pets: {}, hearts: 6, deco: { owned: [], placed: [] }, comp: [1] };
+  d.hearts = Math.min(10, d.hearts || 0);   // 舊存檔的愛心轉為飽足度（上限 10）
   return d;
 })();
+
+/* ---- 飽足度：上限 10，每 90 分鐘自然 -1（離線時間也會計算） ---- */
+const FULL_MAX = 10;
+const FULL_DECAY_MS = 90 * 60 * 1000;
+function fullnessTick() {
+  const now = Date.now();
+  if (!PetState.lastTick) { PetState.lastTick = now; savePet(); return; }
+  const drop = Math.floor((now - PetState.lastTick) / FULL_DECAY_MS);
+  if (drop > 0) {
+    PetState.hearts = Math.max(0, PetState.hearts - drop);
+    PetState.lastTick += drop * FULL_DECAY_MS;
+    savePet();
+  }
+}
+// 三種狀態：吃飽開心(7+) / 普通(4-6) / 肚子餓沒活力(0-3)
+function moodOf() {
+  return PetState.hearts >= 7 ? 'full' : PetState.hearts >= 4 ? 'ok' : 'hungry';
+}
+const MOOD_INFO = {
+  full: { text: '😊 吃飽開心', cls: 'mood-full' },
+  ok: { text: '😌 普通', cls: '' },
+  hungry: { text: '😫 肚子餓…', cls: 'mood-hungry' },
+};
 function savePet() {
   localStorage.setItem('abc-pet', JSON.stringify(PetState));
   Cloud.schedule();
@@ -56,7 +80,7 @@ const canEvolve = pd => targetStage(petLevel(pd.exp)) > pd.stage;
 
 function updateCurrency() {
   $('starCount').textContent = stars;
-  $('heartCount').textContent = PetState.hearts;
+  $('heartCount').textContent = PetState.hearts + '/' + FULL_MAX;
 }
 function playPetLine(i) {
   playFile('assets/voice/pet_line_' + i + '.mp3', null, () => speakZh(PET_LINES[i]));
@@ -146,6 +170,13 @@ function renderHome() {
   $('petName').textContent = def.names[pd.stage];
   $('petLevel').textContent = 'Lv.' + petLevel(pd.exp);
   $('expBar').style.width = (pd.exp % 10) * 10 + '%';
+  // 依飽足度切換狀態外觀
+  fullnessTick();
+  const mood = moodOf();
+  const sp = $('petSprite');
+  sp.classList.remove('mood-full', 'mood-hungry');
+  if (MOOD_INFO[mood].cls) sp.classList.add(MOOD_INFO[mood].cls);
+  $('petMood').textContent = MOOD_INFO[mood].text;
   // 內建家具
   const fb = $('roomFurniture');
   if (!fb.childElementCount) {
@@ -176,7 +207,12 @@ function renderHome() {
 const TAP_LINES = [0, 1, 2, 3, 4, 5, 6, 10];
 $('petSprite').onclick = () => {
   if (roomMoved) return;   // 拖曳結束的誤觸不算點寵物
-  const i = TAP_LINES[Math.floor(Math.random() * TAP_LINES.length)];
+  // 肚子餓時大多喊餓；吃飽時偏向開心的話
+  let i;
+  const mood = moodOf();
+  if (mood === 'hungry' && Math.random() < 0.7) i = 0;
+  else if (mood === 'full' && Math.random() < 0.5) i = [5, 4, 3][Math.floor(Math.random() * 3)];
+  else i = TAP_LINES[Math.floor(Math.random() * TAP_LINES.length)];
   const sp = $('petSprite');
   sp.classList.remove('happy'); void sp.offsetWidth;
   sp.classList.add('happy');
@@ -549,22 +585,32 @@ function renderCare(tab) {
     if (eb) eb.onclick = doEvolve;
   }
   if (tab === 'food') {
+    fullnessTick();
+    const note = document.createElement('div');
+    note.style.cssText = 'text-align:center;color:#666;margin-bottom:10px;font-size:1.05rem';
+    note.textContent = `目前飽足度：🍖 ${PetState.hearts}/${FULL_MAX}（${MOOD_INFO[moodOf()].text}）`;
+    p.appendChild(note);
     const grid = document.createElement('div');
     grid.className = 'care-grid';
     FOODS.forEach(f => {
       const c = document.createElement('div');
       c.className = 'care-card';
       c.innerHTML = `<div class="c-icon">${f.icon}</div><div class="c-name">${f.name}</div>
-                     <div class="c-price">🪙 ${f.cost}｜❤️ +${f.h}</div>`;
+                     <div class="c-price">🪙 ${f.cost}｜🍖 +${f.h}</div>`;
       c.onclick = () => {
+        if (PetState.hearts >= FULL_MAX) {
+          AudioEngine.playSfx('pop');
+          alert('寵物吃太飽了，等牠餓一點再餵吧！');
+          return;
+        }
         if (stars < f.cost) { AudioEngine.playSfx('wrong'); alert('金幣不夠，去冒險賺金幣吧！'); return; }
         stars -= f.cost;
         localStorage.setItem('abc-stars', stars);
-        PetState.hearts += f.h;
+        PetState.hearts = Math.min(FULL_MAX, PetState.hearts + f.h);
         savePet();
         AudioEngine.playSfx('pop');
         playPetLine(7);
-        updateCurrency();
+        renderCare('food');
       };
       grid.appendChild(c);
     });
@@ -835,7 +881,7 @@ function renderProgressCtrl() {
       <b>🎮 進度控制</b>
       <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
         🪙 金幣 <input type="number" id="pcCoins" value="${stars}" min="0" style="width:90px;padding:8px;border-radius:8px;border:2px solid #ddd">
-        ❤️ 愛心 <input type="number" id="pcHearts" value="${PetState.hearts}" min="0" style="width:90px;padding:8px;border-radius:8px;border:2px solid #ddd">
+        🍖 飽足度 <input type="number" id="pcHearts" value="${PetState.hearts}" min="0" max="10" style="width:90px;padding:8px;border-radius:8px;border:2px solid #ddd">
         <button class="pbtn" id="pcMoneySave">套用</button>
       </div>
       <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
@@ -868,7 +914,8 @@ function renderProgressCtrl() {
   $('pcMoneySave').onclick = () => {
     stars = Math.max(0, Number($('pcCoins').value) || 0);
     localStorage.setItem('abc-stars', stars);
-    PetState.hearts = Math.max(0, Number($('pcHearts').value) || 0);
+    PetState.hearts = Math.min(FULL_MAX, Math.max(0, Number($('pcHearts').value) || 0));
+    PetState.lastTick = Date.now();
     savePet();
     updateCurrency();
     AudioEngine.playSfx('ding');
@@ -940,7 +987,7 @@ function renderProgressCtrl() {
       Custom.data = includeCustom ? { words: {}, over: {} } : Custom.data;
       Mem.data = {};
       Heroes.data = { owned: [0, 1, 13], active: 1 };
-      Object.assign(PetState, { active: 'dino', pets: {}, hearts: 0,
+      Object.assign(PetState, { active: 'dino', pets: {}, hearts: 6, lastTick: Date.now(),
         deco: { owned: [], placed: [] }, comp: [1] });
       stars = 0;
       Cloud.push().then(() => location.reload());
@@ -1034,4 +1081,11 @@ const Paint = (() => {
 })();
 
 /* ================= 啟動 ================= */
+fullnessTick();
 renderHome();
+// 開著網頁時每分鐘檢查一次飽足度衰減
+setInterval(() => {
+  fullnessTick();
+  if (currentScreen === 'home') renderHome();
+  updateCurrency();
+}, 60000);
