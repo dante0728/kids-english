@@ -438,6 +438,8 @@ function startBattleGame() {
   });
   $('monsterFace').textContent = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
   AudioEngine.playSfx('growl');
+  Fx.mount($('battleStage'));   // 特效畫布掛在戰鬥舞台上
+  Fx.clear();
   updateHp();
   nextBattleRound();
 }
@@ -515,37 +517,34 @@ function battleWrong(el) {
   setTimeout(() => { if (el) el.classList.remove('wrong'); $('monsterFace').classList.remove('taunt'); }, 550);
   playTryAgain();
 }
+// 組出這一回合的出手順序：寵物打頭陣，接著出戰的英雄夥伴
+function battleParty() {
+  const pd = petData(PetState.active);
+  const list = [{ el: $('heroImg'), skill: Fx.skillOf('pet', PetState.active, pd.stage) }];
+  const imgs = [...$('partyRow').querySelectorAll('img:not(#heroImg)')];
+  PetState.comp.slice(0, 3).filter(h => Heroes.owns(h)).forEach((h, i) => {
+    if (imgs[i]) list.push({ el: imgs[i], skill: Fx.skillOf('hero', h) });
+  });
+  return list;
+}
 function battleHit(el) {
   battle.lock = true;
   if (el) el.classList.add('correct');
-  const pet = $('heroImg');
-  pet.classList.add('charge');
-  AudioEngine.playSfx('power');
-  setTimeout(() => {
-    const bolt = document.createElement('span');
-    bolt.className = 'bolt fly';
-    bolt.textContent = '⚡';
-    bolt.style.left = Math.min($('partyRow').offsetWidth + 6, 420) + 'px';
-    $('battleFx').appendChild(bolt);
-    AudioEngine.playSfx('zap');
-    setTimeout(() => {
-      bolt.remove();
-      pet.classList.remove('charge');
-      const m = $('monsterFace');
-      m.classList.add('hurt');
-      AudioEngine.playSfx('growl');
-      setTimeout(() => m.classList.remove('hurt'), 550);
-      battle.hp--;
-      updateHp();
-      if (battle.hp <= 0) {
-        m.textContent = '😵';
-        setTimeout(battleVictory, 600);
-      } else {
-        playPraise(null);
-        setTimeout(nextBattleRound, 1500);
-      }
-    }, 430);
-  }, 500);
+  const m = $('monsterFace');
+  Fx.partyAttack(battleParty(), m, () => {
+    m.classList.add('hurt');
+    AudioEngine.playSfx('growl');
+    setTimeout(() => m.classList.remove('hurt'), 550);
+    battle.hp--;
+    updateHp();
+    if (battle.hp <= 0) {
+      m.textContent = '😵';
+      setTimeout(battleVictory, 700);
+    } else {
+      playPraise(null);
+      setTimeout(nextBattleRound, 1400);
+    }
+  });
 }
 function battleVictory() {
   AudioEngine.playSfx('fanfare');

@@ -177,11 +177,20 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
   60% { transform: translateX(-8px); } }
 @keyframes taunt { 30% { transform: scale(1.2) rotate(-8deg); } 70% { transform: scale(1.15) rotate(8deg); } }
 #monsterHp { font-size: 1.3rem; letter-spacing: 2px; margin-bottom: 4px; min-height: 1.6rem; }
-#battleFx { position: absolute; left: 0; right: 0; top: 50%; pointer-events: none; }
-.bolt { position: absolute; font-size: 2.6rem; left: 120px; top: -22px; opacity: 0; }
-.bolt.fly { animation: boltFly .45s ease-in forwards; }
-@keyframes boltFly { 0% { opacity: 1; transform: translateX(0) scale(.8); }
-  100% { opacity: 1; transform: translateX(min(310px, 52vw)) scale(1.3); } }
+#battleFx { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+#fxCanvas { position: absolute; left: 0; top: 0; pointer-events: none; }
+.skill-name { position: absolute; left: 50%; top: 2px; transform: translateX(-50%);
+  font-size: 1.35rem; font-weight: bold; color: #fff; opacity: 0;
+  text-shadow: 0 0 6px #000, 2px 2px 0 #1a1a1a, -2px 2px 0 #1a1a1a,
+               2px -2px 0 #1a1a1a, -2px -2px 0 #1a1a1a;
+  white-space: nowrap; pointer-events: none; }
+.skill-name.show { animation: skillPop 1.1s ease-out; }
+@keyframes skillPop {
+  0% { opacity: 0; transform: translateX(-50%) scale(.6); }
+  22% { opacity: 1; transform: translateX(-50%) scale(1.12); }
+  38% { transform: translateX(-50%) scale(1); }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(1); } }
 #battleSpeaker { font-size: 3rem; background: #fff; border: 5px solid #ffb703; border-radius: 50%;
   width: 92px; height: 92px; cursor: pointer; box-shadow: 0 6px 0 #e09600; margin-bottom: 14px; }
 #battleSpeaker:active { transform: translateY(3px); box-shadow: 0 2px 0 #e09600; }
@@ -333,7 +342,7 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 .dex-stage.locked .ds-name { color: #bbb; }
 
 /* 打怪獸：勇者鬥惡龍式隊伍橫排（iPad 橫式優先） */
-#screen-battle { max-width: 1020px; }
+#screen-battle { max-width: 1020px; overflow-x: hidden; }   /* 特效畫布出血不產生捲軸 */
 #battleStage { max-width: 940px; }
 #partyRow { display: flex; align-items: flex-end; gap: 14px; }
 #partyRow img { height: 108px; width: auto; object-fit: contain; }
