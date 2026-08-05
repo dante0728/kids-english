@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320"><style>
+.bob{animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.rocking{animation:rocking 2s ease-in-out infinite;transform-origin:160px 290px}
+@keyframes rocking{25%{transform:rotate(8deg)}75%{transform:rotate(-8deg)}}
+.blink{animation:blink 3s step-end infinite}
+@keyframes blink{0%,91%,96%,100%{opacity:1}92%,95%{opacity:0}}
+.glowp{animation:glowp 1.3s ease-in-out infinite}
+@keyframes glowp{50%{opacity:.3}}
+.wag{animation:wag 1.5s ease-in-out infinite}
+@keyframes wag{50%{transform:rotate(12deg)}}
+.rise{animation:rise 2.6s linear infinite}
+@keyframes rise{to{transform:translateY(-80px);opacity:0}}
+.bob{animation-duration:3.4s}.rocking{animation-duration:3.6s}.wag{animation-duration:3s}svg>g{transform:translateY(6px)}.drop{animation:drop 2.6s ease-in-out infinite}@keyframes drop{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(6px);opacity:.5}}</style><ellipse cx="160" cy="298" rx="80" ry="14" fill="#1a1a1a" opacity=".12"/><g class="rocking"><path d="M160 72 Q142 44 160 22 Q178 44 160 72 Z" fill="#4dabf7" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="160" cy="182" rx="100" ry="108" fill="#74c0fc" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M92 128 Q104 92 138 82" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity=".45"/><circle cx="110" cy="112" r="12" fill="#fff" opacity=".55"/><circle cx="212" cy="226" r="13" fill="#1971c2" opacity=".4"/><circle cx="104" cy="226" r="10" fill="#1971c2" opacity=".4"/><g><path d="M112 166 Q124 180 136 166" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round"/><path d="M184 166 Q196 180 208 166" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round"/><path d="M114 184 L134 184" stroke="#1a1a1a" stroke-width="3" opacity=".45" stroke-linecap="round"/><path d="M186 184 L206 184" stroke="#1a1a1a" stroke-width="3" opacity=".45" stroke-linecap="round"/></g><circle cx="108" cy="200" r="9" fill="#c9c9c9" opacity=".35"/><circle cx="212" cy="200" r="9" fill="#c9c9c9" opacity=".35"/><path d="M136 202 q6.0 -7 12.0 0 q6.0 7 12.0 0 q6.0 -7 12.0 0" fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g><g class="drop"><path d="M258 62 Q248 82 258 90 Q270 84 262 62 Z" fill="#7fd8ff" stroke="#1a1a1a" stroke-width="4" stroke-linejoin="round"/></g></svg>

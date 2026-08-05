@@ -44,10 +44,12 @@ function moodOf() {
   return PetState.hearts >= 7 ? 'full' : PetState.hearts >= 4 ? 'ok' : 'hungry';
 }
 const MOOD_INFO = {
-  full: { text: '😊 吃飽開心', cls: 'mood-full' },
-  ok: { text: '😌 普通', cls: '' },
-  hungry: { text: '😫 肚子餓…', cls: 'mood-hungry' },
+  full: { text: '😊 吃飽開心', cls: 'mood-full', sfx: '_f' },
+  ok: { text: '😌 普通', cls: '', sfx: '' },
+  hungry: { text: '😫 肚子餓…', cls: 'mood-hungry', sfx: '_h' },
 };
+// 目前心情對應的圖片後綴
+function moodSuffix() { return MOOD_INFO[moodOf()].sfx; }
 function savePet() {
   localStorage.setItem('abc-pet', JSON.stringify(PetState));
   Cloud.schedule();
@@ -65,10 +67,11 @@ function petList() {
   return base.concat(customs);
 }
 function petDef(id) { return petList().find(p => p.id === id) || petList()[0]; }
-function petImgSrc(id, stage) {
+// mood: '' 普通 / '_h' 肚子餓 / '_f' 吃飽開心（家長自訂圖沒有心情變化，直接沿用）
+function petImgSrc(id, stage, mood) {
   const def = petDef(id);
   if (def.imgs && def.imgs[stage]) return def.imgs[stage];
-  if (def._default) return `assets/img/pet_${id}_${stage}.svg`;
+  if (def._default) return `assets/img/pet_${id}_${stage}${mood || ''}.svg`;
   return null;   // 自建寵物沒圖 → 用 emoji
 }
 function petData(id) {
@@ -161,9 +164,10 @@ const DECO_ITEMS = [
   { id: 'piano', icon: '🎹', name: '小鋼琴', cost: 50 }, { id: 'mirror', icon: '🪞', name: '鏡子', cost: 30 },
 ];
 function renderHome() {
+  fullnessTick();
   const pd = petData(PetState.active);
   const def = petDef(PetState.active);
-  const src = petImgSrc(PetState.active, pd.stage);
+  const src = petImgSrc(PetState.active, pd.stage, moodSuffix());
   const img = $('petImg');
   if (src) { img.src = src; img.style.display = ''; }
   else { img.style.display = 'none'; }
@@ -171,7 +175,6 @@ function renderHome() {
   $('petLevel').textContent = 'Lv.' + petLevel(pd.exp);
   $('expBar').style.width = (pd.exp % 10) * 10 + '%';
   // 依飽足度切換狀態外觀
-  fullnessTick();
   const mood = moodOf();
   const sp = $('petSprite');
   sp.classList.remove('mood-full', 'mood-hungry');
@@ -422,7 +425,7 @@ function startBattleGame() {
   battle.lock = false;
   battleAsked.clear();
   const pd = petData(PetState.active);
-  const src = petImgSrc(PetState.active, pd.stage);
+  const src = petImgSrc(PetState.active, pd.stage, moodSuffix());
   $('heroImg').src = src || 'assets/img/pet_dino_0.svg';
   // 夥伴英雄：勇者鬥惡龍式站一排（寵物打頭陣）
   const row = $('partyRow');
@@ -573,7 +576,7 @@ function renderCare(tab) {
     const def = petDef(PetState.active);
     const lv = petLevel(pd.exp);
     const nextAt = pd.stage >= 3 ? null : [10, 20, 30][pd.stage];
-    const src = petImgSrc(PetState.active, pd.stage);
+    const src = petImgSrc(PetState.active, pd.stage, moodSuffix());
     p.innerHTML = `<div id="evolveBox">
       ${src ? `<img src="${src}">` : '<div style="font-size:5rem">🥚</div>'}
       <h2>${def.names[pd.stage]}　Lv.${lv}</h2>
