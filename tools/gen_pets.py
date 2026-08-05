@@ -234,17 +234,17 @@ P['leaf_0'] = svg(
 
 # stage1 芽芽兔：綠白小兔，頭頂雙葉芽
 P['leaf_1'] = svg(
-    f'<ellipse cx="122" cy="62" rx="19" ry="46" fill="#fff" {S} transform="rotate(-12 122 62)"/>'
-    f'<ellipse cx="198" cy="62" rx="19" ry="46" fill="#fff" {S} transform="rotate(12 198 62)"/>'
+    f'<ellipse cx="122" cy="62" rx="19" ry="46" fill="#8fd694" {S} transform="rotate(-12 122 62)"/>'
+    f'<ellipse cx="198" cy="62" rx="19" ry="46" fill="#8fd694" {S} transform="rotate(12 198 62)"/>'
     f'<ellipse cx="123" cy="66" rx="9" ry="28" fill="{PINK}" transform="rotate(-12 123 66)"/>'
     f'<ellipse cx="197" cy="66" rx="9" ry="28" fill="{PINK}" transform="rotate(12 197 66)"/>'
     f'<path d="M160 84 Q144 62 120 66 Q132 92 158 88 M160 84 Q176 62 200 66 Q188 92 162 88" '
     f'fill="{LEAF}" {St}/>'
-    f'<ellipse cx="160" cy="248" rx="58" ry="46" fill="#fff" {S}/>'
+    f'<ellipse cx="160" cy="248" rx="58" ry="46" fill="#8fd694" {S}/>'
     f'<ellipse cx="160" cy="256" rx="32" ry="26" fill="#d3f9d8" {St}/>'
-    f'<ellipse cx="112" cy="280" rx="20" ry="13" fill="#fff" {St}/>'
-    f'<ellipse cx="208" cy="280" rx="20" ry="13" fill="#fff" {St}/>'
-    f'<circle cx="160" cy="142" r="64" fill="#fff" {S}/>'
+    f'<ellipse cx="112" cy="280" rx="20" ry="13" fill="#8fd694" {St}/>'
+    f'<ellipse cx="208" cy="280" rx="20" ry="13" fill="#8fd694" {St}/>'
+    f'<circle cx="160" cy="142" r="64" fill="#8fd694" {S}/>'
     + eyes(136, dx=26, r=10)
     + f'<path d="M152 160 L168 160 L160 170 Z" fill="{PINK}" {St}/>'
     + f'<path d="M160 170 L160 178 M160 178 Q150 186 142 180 M160 178 Q170 186 178 180" fill="none" {St}/>'

@@ -26,9 +26,13 @@
 <!-- 寵物之家（主畫面） -->
 <div class="screen active" id="screen-home">
   <div id="petRoom">
-    <div id="roomDeco"></div>
+    <div id="roomWorld">
+      <div id="roomFurniture"></div>
+      <div id="roomDeco"></div>
+      <div id="petSprite"><img id="petImg" src="" alt="pet"></div>
+    </div>
     <div id="petBubble"></div>
-    <div id="petSprite"><img id="petImg" src="" alt="pet"></div>
+    <div id="panHint">👆 拖一拖可以參觀房間</div>
   </div>
   <div id="petStatus">
     <span id="petName"></span>
@@ -120,8 +124,7 @@
 <div class="screen" id="screen-battle">
   <h1>⚔️ 打怪獸</h1>
   <div id="battleStage">
-    <div id="heroBox"><img id="heroImg" src="" alt="pet"></div>
-    <div id="companionRow"></div>
+    <div id="partyRow"><img id="heroImg" src="" alt="pet"></div>
     <div id="battleFx"></div>
     <div id="monsterBox">
       <div id="monsterHp"></div>
@@ -258,6 +261,26 @@
 <div id="confetti"></div>
 
 <div id="evolveFlash"></div>
+
+<!-- 簡易繪圖板（家長模式用） -->
+<div id="paintModal">
+  <div id="paintBox">
+    <div id="paintTools">
+      <span id="paintColors"></span>
+      <button class="pbtn" data-size="6">細</button>
+      <button class="pbtn" data-size="14">中</button>
+      <button class="pbtn" data-size="26">粗</button>
+      <button class="pbtn" id="paintEraser">🧽</button>
+      <button class="pbtn" id="paintUndo">↩️</button>
+      <button class="pbtn" id="paintClear">🗑️</button>
+    </div>
+    <canvas id="paintCanvas" width="320" height="320"></canvas>
+    <div id="paintActions">
+      <button class="small-btn" id="paintCancel">取消</button>
+      <button class="small-btn pink" id="paintSave">✅ 使用這張圖</button>
+    </div>
+  </div>
+</div>
 
 <script src="js/words.js"></script>
 <script src="js/audio.js"></script>

@@ -84,11 +84,51 @@ function gainExp(n) {
   return after > before;
 }
 
-/* ================= 寵物之家 ================= */
-const DECO_SLOTS = [
-  { left: '4%', top: '58%' }, { left: '82%', top: '58%' }, { left: '8%', top: '20%' },
-  { left: '80%', top: '18%' }, { left: '22%', top: '70%' }, { left: '68%', top: '72%' },
+/* ================= 寵物之家（大房間可拖曳參觀） ================= */
+const WORLD = { w: 1200, h: 640 };
+// 內建家具（世界座標）
+const FURNITURE = [
+  { icon: '🚪', x: 18, y: 130, s: 110 }, { icon: '🛏️', x: 70, y: 330, s: 120 },
+  { icon: '🪟', x: 330, y: 80, s: 96 }, { icon: '🕰️', x: 560, y: 60, s: 64 },
+  { icon: '🖼️', x: 710, y: 95, s: 74 }, { icon: '🛋️', x: 920, y: 330, s: 112 },
+  { icon: '📚', x: 1075, y: 200, s: 100 }, { icon: '🪑', x: 250, y: 400, s: 76 },
+  { icon: '🧺', x: 1115, y: 500, s: 60 },
 ];
+// 買來的裝飾品的擺放位置（世界座標）
+const DECO_SLOTS = [
+  { x: 200, y: 500 }, { x: 400, y: 530 }, { x: 660, y: 520 },
+  { x: 830, y: 490 }, { x: 1000, y: 545 }, { x: 480, y: 130 },
+];
+// 房間拖曳（拖了就不觸發點寵物）
+let roomMoved = false;
+(function setupRoomPan() {
+  const room = $('petRoom'), world = $('roomWorld');
+  let px = 0, py = 0, sx = 0, sy = 0, bx = 0, by = 0, dragging = false;
+  function apply() {
+    px = Math.min(0, Math.max(room.clientWidth - WORLD.w, px));
+    py = Math.min(0, Math.max(room.clientHeight - WORLD.h, py));
+    world.style.transform = `translate(${px}px, ${py}px)`;
+  }
+  room.addEventListener('pointerdown', e => {
+    dragging = true; roomMoved = false;
+    sx = e.clientX; sy = e.clientY; bx = px; by = py;
+    try { room.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  room.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) + Math.abs(dy) > 8) roomMoved = true;
+    px = bx + dx; py = by + dy;
+    apply();
+  });
+  const end = () => { dragging = false; };
+  room.addEventListener('pointerup', end);
+  room.addEventListener('pointercancel', end);
+  window.centerOnPet = () => {   // 進首頁時把視角對準寵物
+    px = room.clientWidth / 2 - 580; py = room.clientHeight - WORLD.h;
+    apply();
+  };
+})();
 const DECO_ITEMS = [
   { id: 'plant', icon: '🪴', name: '小盆栽', cost: 20 }, { id: 'bear', icon: '🧸', name: '熊熊', cost: 25 },
   { id: 'ball', icon: '⚽', name: '足球', cost: 15 }, { id: 'art', icon: '🖼️', name: '掛畫', cost: 30 },
@@ -105,7 +145,18 @@ function renderHome() {
   $('petName').textContent = def.names[pd.stage];
   $('petLevel').textContent = 'Lv.' + petLevel(pd.exp);
   $('expBar').style.width = (pd.exp % 10) * 10 + '%';
-  // 裝飾
+  // 內建家具
+  const fb = $('roomFurniture');
+  if (!fb.childElementCount) {
+    FURNITURE.forEach(f => {
+      const s = document.createElement('span');
+      s.className = 'furn';
+      s.textContent = f.icon;
+      s.style.cssText = `left:${f.x}px;top:${f.y}px;font-size:${f.s}px`;
+      fb.appendChild(s);
+    });
+  }
+  // 買來的裝飾
   const box = $('roomDeco');
   box.innerHTML = '';
   PetState.deco.placed.slice(0, DECO_SLOTS.length).forEach((id, k) => {
@@ -114,15 +165,17 @@ function renderHome() {
     const s = document.createElement('span');
     s.className = 'deco-item';
     s.textContent = item.icon;
-    s.style.left = DECO_SLOTS[k].left;
-    s.style.top = DECO_SLOTS[k].top;
+    s.style.left = DECO_SLOTS[k].x + 'px';
+    s.style.top = DECO_SLOTS[k].y + 'px';
     box.appendChild(s);
   });
+  if (window.centerOnPet) centerOnPet();
   updateCurrency();
 }
 // 點寵物：隨機互動語音
 const TAP_LINES = [0, 1, 2, 3, 4, 5, 6, 10];
 $('petSprite').onclick = () => {
+  if (roomMoved) return;   // 拖曳結束的誤觸不算點寵物
   const i = TAP_LINES[Math.floor(Math.random() * TAP_LINES.length)];
   const sp = $('petSprite');
   sp.classList.remove('happy'); void sp.offsetWidth;
@@ -335,9 +388,9 @@ function startBattleGame() {
   const pd = petData(PetState.active);
   const src = petImgSrc(PetState.active, pd.stage);
   $('heroImg').src = src || 'assets/img/pet_dino_0.svg';
-  // 夥伴英雄（最多 3 個）
-  const row = $('companionRow');
-  row.innerHTML = '';
+  // 夥伴英雄：勇者鬥惡龍式站一排（寵物打頭陣）
+  const row = $('partyRow');
+  [...row.querySelectorAll('img:not(#heroImg)')].forEach(x => x.remove());
   PetState.comp.slice(0, 3).forEach(h => {
     if (!Heroes.owns(h)) return;
     const im = document.createElement('img');
@@ -433,6 +486,7 @@ function battleHit(el) {
     const bolt = document.createElement('span');
     bolt.className = 'bolt fly';
     bolt.textContent = '⚡';
+    bolt.style.left = Math.min($('partyRow').offsetWidth + 6, 420) + 'px';
     $('battleFx').appendChild(bolt);
     AudioEngine.playSfx('zap');
     setTimeout(() => {
@@ -654,7 +708,10 @@ function renderPetEditor() {
       stagesHtml += `<div style="text-align:center">
         ${src ? `<img src="${src}" style="width:64px;height:64px;object-fit:contain">` : '<div style="font-size:2.4rem">🥚</div>'}
         <input type="text" data-s="${s}" value="${p.names[s]}" style="width:86px;padding:6px;border-radius:8px;border:2px solid #ddd;font-size:.85rem;text-align:center">
-        <label class="pbtn" style="display:block;margin-top:4px;font-size:.8rem">📷<input type="file" data-img="${s}" accept="image/*" hidden></label>
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:4px">
+          <label class="pbtn" style="font-size:.8rem">📷<input type="file" data-img="${s}" accept="image/*" hidden></label>
+          <button class="pbtn" data-draw="${s}" style="font-size:.8rem">🎨</button>
+        </div>
       </div>`;
     }
     sec.innerHTML = `<div style="width:100%">
@@ -692,6 +749,21 @@ function renderPetEditor() {
         Custom.save();
         renderPetEditor();
       };
+    });
+    // 用繪圖板畫造型
+    sec.querySelectorAll('[data-draw]').forEach(btn => {
+      btn.onclick = () => Paint.open(data => {
+        const s = Number(btn.dataset.draw);
+        if (p._customPet) {
+          const cp = cfg.customs.find(x => x.id === p.id);
+          (cp.imgs = cp.imgs || [])[s] = data;
+        } else {
+          const ov = cfg.over[p.id] = cfg.over[p.id] || {};
+          (ov.imgs = ov.imgs || [])[s] = data;
+        }
+        Custom.save();
+        renderPetEditor();
+      });
     });
     // 刪自建寵物
     const del = sec.querySelector('.pbtn.del');
@@ -751,6 +823,81 @@ function renderGroupEditor() {
     };
   });
 }
+
+/* ================= 簡易繪圖板（家長模式：畫單字圖/寵物造型） ================= */
+const Paint = (() => {
+  const modal = $('paintModal'), cv = $('paintCanvas'), ctx = cv.getContext('2d');
+  const COLORS = ['#1a1a1a', '#c8102e', '#ff9f1c', '#ffd60a', '#2a9d3f', '#1446a0',
+                  '#845ec2', '#ff6b9d', '#8b5e3c', '#ffffff'];
+  let color = COLORS[0], size = 14, erasing = false, cb = null, drawing = false;
+  const undoStack = [];
+  // 色盤
+  const colorBox = $('paintColors');
+  COLORS.forEach(c => {
+    const b = document.createElement('span');
+    b.className = 'paint-color' + (c === color ? ' on' : '');
+    b.style.background = c;
+    b.onclick = () => {
+      color = c; erasing = false;
+      $('paintEraser').classList.remove('on');
+      colorBox.querySelectorAll('.paint-color').forEach(x => x.classList.toggle('on', x === b));
+    };
+    colorBox.appendChild(b);
+  });
+  document.querySelectorAll('#paintTools [data-size]').forEach(b => {
+    b.onclick = () => {
+      size = Number(b.dataset.size);
+      document.querySelectorAll('#paintTools [data-size]').forEach(x => x.classList.toggle('on', x === b));
+    };
+  });
+  $('paintEraser').onclick = () => { erasing = !erasing; $('paintEraser').classList.toggle('on', erasing); };
+  $('paintUndo').onclick = () => {
+    if (undoStack.length) ctx.putImageData(undoStack.pop(), 0, 0);
+  };
+  $('paintClear').onclick = () => { snap(); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); };
+  function snap() {
+    undoStack.push(ctx.getImageData(0, 0, cv.width, cv.height));
+    if (undoStack.length > 20) undoStack.shift();
+  }
+  function pos(e) {
+    const r = cv.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
+  }
+  cv.addEventListener('pointerdown', e => {
+    drawing = true; snap();
+    const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y);
+    stroke();
+    try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drawing) return;
+    const p = pos(e);
+    ctx.lineTo(p.x, p.y);
+    stroke();
+  });
+  cv.addEventListener('pointerup', () => { drawing = false; });
+  function stroke() {
+    ctx.lineCap = ctx.lineJoin = 'round';
+    ctx.lineWidth = size;
+    ctx.strokeStyle = erasing ? '#ffffff' : color;
+    ctx.stroke();
+  }
+  $('paintCancel').onclick = () => { modal.classList.remove('show'); cb = null; };
+  $('paintSave').onclick = () => {
+    modal.classList.remove('show');
+    const fn = cb; cb = null;
+    if (fn) fn(cv.toDataURL('image/jpeg', 0.85));
+  };
+  return {
+    open(fn) {
+      cb = fn;
+      undoStack.length = 0;
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      modal.classList.add('show');
+    },
+  };
+})();
 
 /* ================= 啟動 ================= */
 renderHome();

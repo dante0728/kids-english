@@ -797,7 +797,8 @@ function buildEditor(w, i, key) {
     <div class="row"><input type="text" id="peSen" value="${(w.sen || '').replace(/"/g, '&quot;')}" placeholder="英文例句">
       <input type="text" id="peSzh" value="${(w.szh || '').replace(/"/g, '&quot;')}" placeholder="中文例句"></div>
     <div class="row"><button class="pbtn" id="peSave" style="border-color:#2ecc71;font-weight:bold">💾 儲存文字</button>
-      <label class="pbtn">📷 換圖片<input type="file" id="peImg" accept="image/*" hidden></label></div>
+      <label class="pbtn">📷 換圖片<input type="file" id="peImg" accept="image/*" hidden></label>
+      <button class="pbtn" id="peDraw">🎨 自己畫</button></div>
     <div class="sec-label">🔊 單字聲音</div>
     <div class="row">
       <button class="pbtn rec" id="peRecW" data-k="w">🎙️ 錄音</button>
@@ -849,6 +850,11 @@ function buildEditor(w, i, key) {
     else (Custom.data.over[key] = Custom.data.over[key] || {}).img = data;
     Custom.save(); renderParentList();
   };
+  box.querySelector('#peDraw').onclick = () => Paint.open(data => {
+    if (w._custom) getCustomWord(i).img = data;
+    else (Custom.data.over[key] = Custom.data.over[key] || {}).img = data;
+    Custom.save(); renderParentList();
+  });
   box.querySelector('#peRecW').onclick = () => toggleRecord(box.querySelector('#peRecW'), d => setAudio('w', d));
   box.querySelector('#peRecS').onclick = () => toggleRecord(box.querySelector('#peRecS'), d => setAudio('s', d));
   box.querySelector('#peUpW').onchange = (e) => {

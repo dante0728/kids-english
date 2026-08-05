@@ -224,17 +224,23 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 /* ===== 寵物之家 ===== */
 #hearts { font-size: 1.2rem; background: #fff; border-radius: 999px; padding: 8px 16px;
   border: 4px solid #ff6b9d; box-shadow: 0 4px 0 #d14b7d; }
-#petRoom { position: relative; width: 100%; max-width: 560px; height: min(46vh, 340px);
-  background: linear-gradient(180deg, #cdeffd 0%, #e8fbf1 62%, #ffe8b3 62%, #ffd98a 100%);
-  border: 5px solid #b98a3e; border-radius: 26px; overflow: hidden; }
-#petSprite { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%);
+#petRoom { position: relative; width: 100%; max-width: 760px; height: min(56vh, 420px);
+  border: 5px solid #b98a3e; border-radius: 26px; overflow: hidden;
+  touch-action: none; cursor: grab; background: #cdeffd; }
+#petRoom:active { cursor: grabbing; }
+#roomWorld { position: absolute; left: 0; top: 0; width: 1200px; height: 640px;
+  background: linear-gradient(180deg, #cdeffd 0%, #e3f6ff 40%, #f6efd9 62%, #ffe8b3 63%, #ffd98a 100%);
+  will-change: transform; }
+#roomFurniture { position: absolute; inset: 0; pointer-events: none; }
+.furn { position: absolute; line-height: 1; user-select: none; }
+#panHint { position: absolute; right: 10px; bottom: 8px; background: rgba(255,255,255,.85);
+  border-radius: 999px; padding: 4px 12px; font-size: .8rem; color: #888; pointer-events: none; }
+#petSprite { position: absolute; left: 480px; bottom: 60px;
   cursor: pointer; transition: transform .15s; }
-#petSprite:active { transform: translateX(-50%) scale(.94); }
-#petSprite img { width: min(46vw, 210px); height: min(46vw, 210px); }
-#petSprite.eat { animation: petEat .8s; }
-@keyframes petEat { 25% { transform: translateX(-50%) scale(1.1, .9); } 60% { transform: translateX(-50%) scale(.95, 1.06); } }
+#petSprite:active { transform: scale(.94); }
+#petSprite img { width: 200px; height: 200px; }
 #petSprite.happy { animation: petHappy .7s; }
-@keyframes petHappy { 30% { transform: translateX(-50%) translateY(-24px); } }
+@keyframes petHappy { 30% { transform: translateY(-24px); } }
 #petBubble { position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
   background: #fff; border: 3px solid #444; border-radius: 16px; padding: 8px 16px;
   font-size: 1.05rem; color: #333; max-width: 86%; text-align: center; opacity: 0;
@@ -322,12 +328,39 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 .dex-stage .ds-name { font-size: .8rem; color: #666; }
 .dex-stage.locked .ds-name { color: #bbb; }
 
-/* 打怪獸：夥伴列與口說題 */
-#companionRow { position: absolute; left: 4px; bottom: 4px; display: flex; gap: 2px; }
-#companionRow img { width: 44px; height: 60px; object-fit: contain; }
+/* 打怪獸：勇者鬥惡龍式隊伍橫排（iPad 橫式優先） */
+#screen-battle { max-width: 1020px; }
+#battleStage { max-width: 940px; }
+#partyRow { display: flex; align-items: flex-end; gap: 14px; }
+#partyRow img { height: 108px; width: auto; object-fit: contain; }
+#partyRow img#heroImg { height: 156px; transition: transform .2s, filter .2s; }
+#partyRow img.charge { transform: scale(1.18); filter: drop-shadow(0 0 18px #ffd60a); }
 #battleAsk { text-align: center; margin-bottom: 10px; min-height: 2rem; font-size: 1.15rem; color: #555; }
 #battleBig { text-align: center; }
 #battleBig .pic img { width: 150px; height: 150px; }
+@media (max-height: 520px) {   /* iPad/手機橫式：壓縮直向空間 */
+  #screen-battle h1 { display: none; }
+  #battleStage { min-height: 130px; }
+  #partyRow img { height: 84px; }
+  #partyRow img#heroImg { height: 118px; }
+  #monsterFace { font-size: 4.6rem; }
+  #battleSpeaker { width: 66px; height: 66px; font-size: 2.2rem; margin-bottom: 8px; }
+  #petRoom { height: 62vh; }
+}
+
+/* ===== 簡易繪圖板 ===== */
+#paintModal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none;
+  align-items: center; justify-content: center; z-index: 220; }
+#paintModal.show { display: flex; }
+#paintBox { background: #fff; border-radius: 20px; padding: 14px; max-width: 96vw; }
+#paintTools { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; }
+#paintColors { display: flex; gap: 4px; flex-wrap: wrap; }
+.paint-color { width: 30px; height: 30px; border-radius: 50%; border: 3px solid #ddd; cursor: pointer; }
+.paint-color.on { border-color: #1a1a1a; transform: scale(1.15); }
+#paintTools .pbtn.on { background: #e2fbf9; border-color: #1a1a1a; }
+#paintCanvas { border: 3px solid #ddd; border-radius: 12px; touch-action: none; cursor: crosshair;
+  width: min(70vw, 380px); height: min(70vw, 380px); background: #fff; display: block; margin: 0 auto; }
+#paintActions { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
 
 /* ===== 家長模式分頁 ===== */
 #ptabs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 4px 0 14px; }
