@@ -476,6 +476,7 @@ function startBattleGame() {
 }
 function nextBattleRound() {
   battle.lock = false;
+  battle.explainZh = null;
   ['battleAsk', 'battleBig', 'battleChoices', 'battleControls'].forEach(id => { $(id).innerHTML = ''; });
   const quiz = pickQuizPool(poolFor(currentTheme), battleAsked);
   battle.answer = quiz.answer;
@@ -515,13 +516,14 @@ function nextBattleRound() {
       ctl.appendChild(b);
       return b;
     };
+    // 例句題答對後要說明中文意思：交給 battleHit 在攻擊結束後依序播完再進下一題
+    battle.explainZh = isSen && w.szh ? w.szh : null;
     if (SR) {
       const mic = addBtn('🎤 開始唸', 'pink', () => {
         recognizeOnce(w.en, mic, ok => {
           if (ok) {
             Mem.rec(battle.answer.t, battle.answer.i, true);
             battleHit(null);
-            if (isSen && w.szh) setTimeout(() => speakZh(w.szh), 1600);   // 說明中文
           } else { AudioEngine.playSfx('wrong'); playTryAgain(); $('monsterFace').classList.add('taunt'); setTimeout(() => $('monsterFace').classList.remove('taunt'), 550); }
         });
       });
@@ -529,7 +531,6 @@ function nextBattleRound() {
     addBtn('✋ 唸對了', '', () => {
       Mem.rec(battle.answer.t, battle.answer.i, true);
       battleHit(null);
-      if (isSen && w.szh) setTimeout(() => speakZh(w.szh), 1600);
     });
     if (isSen) setTimeout(() => { stopSpeech(); chainId++; speakEn(w.sen); }, 450);
   }
@@ -573,12 +574,25 @@ function battleHit(el) {
     if (ult) { battle.energy = 0; } else { battle.energy = Math.min(ULT_NEED, battle.energy + 1); }
     updateHp();
     updateUltGauge();
-    if (battle.hp <= 0) {
-      m.textContent = '😵';
-      setTimeout(battleVictory, ult ? 1000 : 700);
+
+    const win = battle.hp <= 0;
+    if (win) m.textContent = '😵';
+    let moved = false;
+    const proceed = () => {
+      if (moved) return;                     // 只會前進一次
+      moved = true;
+      if (win) setTimeout(battleVictory, ult ? 900 : 600);
+      else setTimeout(nextBattleRound, 500);
+    };
+    // 例句題：先把中文意思完整講完，再進下一題或結算（不再被 stopSpeech 切斷）
+    const zh = battle.explainZh;
+    battle.explainZh = null;
+    if (zh) {
+      playPraise(() => speakZh(zh, proceed));
+      setTimeout(proceed, 9000);             // 保險：音訊沒回報結束也不會卡住
     } else {
       playPraise(null);
-      setTimeout(nextBattleRound, ult ? 1800 : 1400);
+      setTimeout(proceed, ult ? 1300 : 900);
     }
   };
 
