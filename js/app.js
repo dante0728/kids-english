@@ -243,7 +243,8 @@ function streakDays() {
 
 /* ================= 英雄收藏與商店 ================= */
 // 免費：鋼鐵人0/蜘蛛人1/超人13；熱門 30⭐；其他 15⭐
-const HERO_COST = [0, 0, 30, 30, 30, 15, 15, 15, 15, 15, 15, 15, 15, 0, 30, 30, 30, 15, 15, 15];
+const HERO_COST = [0, 0, 30, 30, 30, 15, 15, 15, 15, 15, 15, 15, 15, 0, 30, 30, 30, 15, 15, 15,
+                   25, 25, 30, 20, 20, 20, 30, 20, 30, 25];
 const Heroes = {
   data: (() => { try { return JSON.parse(localStorage.getItem('abc-heroes')) || { owned: [0, 1, 13], active: 1 }; }
                  catch (e) { return { owned: [0, 1, 13], active: 1 }; } })(),
@@ -575,7 +576,8 @@ $('nextWordBtn').onclick = nextSpeakWord;
 /* ================= 遊戲四：英雄打怪獸 ================= */
 const MONSTERS = ['👾', '🐲', '🦖', '👹', '🧌'];
 const ULT_NEED = 3;                 // 連續答對幾題發動必殺技
-let battle = { hp: 5, max: 5, answer: null, lock: false, energy: 0 };
+const MONSTER_HP = 10;              // 一場冒險的題數
+let battle = { hp: MONSTER_HP, max: MONSTER_HP, answer: null, lock: false, energy: 0 };
 const battleAsked = new Set();         // 這一場出過的字（不重複）
 
 function startBattleGame() {
@@ -590,8 +592,8 @@ function startBattleGame() {
   nextBattleRound();
 }
 function updateHp() {
-  $('monsterHp').textContent = '❤️'.repeat(Math.max(0, battle.hp)) +
-                               '🖤'.repeat(Math.max(0, battle.max - battle.hp));
+  const hp = Math.max(0, battle.hp);
+  $('monsterHp').textContent = '❤️ ' + hp + ' / ' + battle.max;
 }
 // 必殺技能量槽（答對集氣，滿了下一次答對就發動）
 function updateUltGauge() {

@@ -114,18 +114,31 @@ function gainExp(n) {
 /* ================= 寵物之家（大房間可拖曳參觀） ================= */
 const WORLD = { w: 1200, h: 640 };
 // 內建家具（世界座標，yb = 底部貼地位置；地板線約 y=400）
+// 左半＝客廳（門、沙發、電視），右半＝臥室（床、櫃子）
 const FURNITURE = [
-  { icon: '🚪', x: 30, yb: 435, s: 175 }, { icon: '🛏️', x: 185, yb: 500, s: 145 },
-  { icon: '🪟', x: 380, yb: 235, s: 115 }, { icon: '🕰️', x: 610, yb: 130, s: 70 },
-  { icon: '🖼️', x: 745, yb: 225, s: 85 }, { icon: '🛋️', x: 860, yb: 505, s: 130 },
-  { icon: '🗄️', x: 1055, yb: 460, s: 135 }, { icon: '🪑', x: 320, yb: 545, s: 85 },
-  { icon: '🧺', x: 1125, yb: 600, s: 62 },
+  { icon: '🚪', x: 25, yb: 440, s: 175 },    // 門（最左）
+  { icon: '🛋️', x: 205, yb: 508, s: 140 },   // 沙發（客廳，靠門）
+  { icon: '📺', x: 365, yb: 470, s: 100 },   // 電視
+  { icon: '🪟', x: 520, yb: 250, s: 120 },   // 窗（牆上）
+  { icon: '🕰️', x: 700, yb: 145, s: 70 },    // 時鐘（牆上）
+  { icon: '🖼️', x: 815, yb: 238, s: 88 },    // 掛畫（牆上）
+  { icon: '🪑', x: 760, yb: 552, s: 85 },    // 椅子
+  { icon: '🛏️', x: 880, yb: 518, s: 150 },   // 床（右邊臥室）
+  { icon: '🗄️', x: 1050, yb: 472, s: 125 },  // 收納櫃
+  { icon: '🧺', x: 1120, yb: 612, s: 58 },   // 籃子
 ];
-// 買來的裝飾品的擺放位置（世界座標，底部貼地）
-const DECO_SIZE = 52;
+// 買來的裝飾品的擺放位置（世界座標，底部貼地；四排造出前後景深）
+const DECO_SIZE = 50;
 const DECO_SLOTS = [
-  { x: 255, yb: 585 }, { x: 445, yb: 570 }, { x: 710, yb: 580 },
-  { x: 900, yb: 600 }, { x: 1010, yb: 555 }, { x: 110, yb: 600 },
+  { x: 160, yb: 482 }, { x: 300, yb: 482 }, { x: 445, yb: 482 }, { x: 620, yb: 482 },
+  { x: 905, yb: 482 }, { x: 1000, yb: 482 }, { x: 1150, yb: 482 },
+  { x: 95, yb: 524 }, { x: 235, yb: 524 }, { x: 375, yb: 524 }, { x: 505, yb: 524 },
+  { x: 645, yb: 524 }, { x: 790, yb: 524 }, { x: 1058, yb: 524 },
+  { x: 130, yb: 572 }, { x: 275, yb: 572 }, { x: 415, yb: 572 }, { x: 725, yb: 572 },
+  { x: 865, yb: 572 }, { x: 1000, yb: 572 }, { x: 1130, yb: 572 },
+  { x: 60, yb: 622 }, { x: 195, yb: 622 }, { x: 330, yb: 622 }, { x: 455, yb: 622 },
+  { x: 700, yb: 622 }, { x: 835, yb: 622 }, { x: 965, yb: 622 }, { x: 1090, yb: 622 },
+  { x: 560, yb: 645 },
 ];
 // 房間拖曳（拖了就不觸發點寵物）
 let roomMoved = false;
@@ -162,6 +175,17 @@ const DECO_ITEMS = [
   { id: 'ball', icon: '⚽', name: '足球', cost: 15 }, { id: 'art', icon: '🖼️', name: '掛畫', cost: 30 },
   { id: 'train', icon: '🚂', name: '小火車', cost: 35 }, { id: 'balloon', icon: '🎈', name: '氣球', cost: 10 },
   { id: 'piano', icon: '🎹', name: '小鋼琴', cost: 50 }, { id: 'mirror', icon: '🪞', name: '鏡子', cost: 30 },
+  { id: 'slide', icon: '🛝', name: '溜滑梯', cost: 55 }, { id: 'tent', icon: '⛺', name: '帳篷', cost: 45 },
+  { id: 'kite', icon: '🪁', name: '風箏', cost: 15 }, { id: 'puzzle', icon: '🧩', name: '拼圖', cost: 20 },
+  { id: 'yoyo', icon: '🪀', name: '溜溜球', cost: 12 }, { id: 'easel', icon: '🎨', name: '畫架', cost: 35 },
+  { id: 'books', icon: '📚', name: '書堆', cost: 25 }, { id: 'game', icon: '🕹️', name: '遊戲機', cost: 50 },
+  { id: 'cactus', icon: '🌵', name: '仙人掌', cost: 18 }, { id: 'sunflower', icon: '🌻', name: '向日葵', cost: 18 },
+  { id: 'fishtank', icon: '🐠', name: '魚缸', cost: 40 }, { id: 'tub', icon: '🛁', name: '浴缸', cost: 60 },
+  { id: 'bike', icon: '🚲', name: '腳踏車', cost: 40 }, { id: 'scooter', icon: '🛴', name: '滑板車', cost: 30 },
+  { id: 'guitar', icon: '🎸', name: '吉他', cost: 45 }, { id: 'drum', icon: '🥁', name: '小鼓', cost: 35 },
+  { id: 'basketball', icon: '🏀', name: '籃球', cost: 15 }, { id: 'dart', icon: '🎯', name: '飛鏢靶', cost: 25 },
+  { id: 'fridge', icon: '🧊', name: '冰箱', cost: 55 }, { id: 'umbrella', icon: '☂️', name: '雨傘架', cost: 20 },
+  { id: 'candle', icon: '🕯️', name: '蠟燭', cost: 12 }, { id: 'gift', icon: '🎁', name: '禮物盒', cost: 30 },
 ];
 function renderHome() {
   fullnessTick();
@@ -230,9 +254,9 @@ document.querySelectorAll('.nav-btn').forEach(b => {
     AudioEngine.playSfx('ding');
     const go = b.dataset.go;
     if (go === 'learn') { showScreen('learn'); renderLearnMenu(); }
-    if (go === 'adventure') { showScreen('menu'); renderThemeMenu(); }
-    if (go === 'care') { showScreen('care'); renderCare('evolve'); }
-    if (go === 'dex') { showScreen('dex'); renderDex(); }
+    else if (go === 'adventure') { showScreen('menu'); renderThemeMenu(); }
+    else if (go === 'dex') { showScreen('dex'); renderDex(); }
+    else { showScreen('care'); renderCare(go); }   // 進化 / 餵食 / 裝飾 / 夥伴
   };
 });
 
@@ -421,7 +445,7 @@ function recognizeOnce(target, btn, cb) {
 /* ================= 冒險：三種題型（覆寫 app.js 戰鬥） ================= */
 function startBattleGame() {
   showScreen('battle');
-  battle.hp = battle.max = 5;
+  battle.hp = battle.max = MONSTER_HP;
   battle.lock = false;
   battle.energy = 0;
   battleAsked.clear();
@@ -638,32 +662,46 @@ function renderCare(tab) {
     p.appendChild(grid);
   }
   if (tab === 'deco') {
+    // 上方：房間即時預覽（看得到擺設效果）
+    const prev = document.createElement('div');
+    prev.id = 'decoPreview';
+    prev.innerHTML = '<div id="decoWorld"></div>';
+    p.appendChild(prev);
+    const tip = document.createElement('div');
+    tip.id = 'decoTip';
+    p.appendChild(tip);
+    paintDecoPreview();
+    // 下方：可買/可擺的物品（30 種）
     const grid = document.createElement('div');
-    grid.className = 'care-grid';
+    grid.className = 'care-grid deco-grid';
     DECO_ITEMS.forEach(item => {
       const owned = PetState.deco.owned.includes(item.id);
       const placed = PetState.deco.placed.includes(item.id);
       const c = document.createElement('div');
-      c.className = 'care-card' + (placed ? ' placed' : owned ? ' owned' : '');
+      c.className = 'care-card deco-card' + (placed ? ' placed' : owned ? ' owned' : '');
       c.innerHTML = `<div class="c-icon">${item.icon}</div><div class="c-name">${item.name}</div>
-        <div class="c-price">${owned ? (placed ? '已擺出來 ✓' : '點我擺出來') : '🪙 ' + item.cost}</div>`;
+        <div class="c-price">${owned ? (placed ? '✓ 已擺出' : '點我擺出') : '🪙 ' + item.cost}</div>`;
       c.onclick = () => {
         if (!owned) {
-          if (stars < item.cost) { AudioEngine.playSfx('wrong'); alert('金幣不夠，去冒險賺金幣吧！'); return; }
+          if (stars < item.cost) { AudioEngine.playSfx('wrong'); decoTip('金幣不夠，去冒險賺金幣吧！'); return; }
           stars -= item.cost;
           localStorage.setItem('abc-stars', stars);
           PetState.deco.owned.push(item.id);
           if (PetState.deco.placed.length < DECO_SLOTS.length) PetState.deco.placed.push(item.id);
           AudioEngine.playSfx('jingle');
+          decoTip('買到「' + item.name + '」，擺進家裡囉！');
         } else if (placed) {
           PetState.deco.placed = PetState.deco.placed.filter(x => x !== item.id);
           AudioEngine.playSfx('pop');
+          decoTip('把「' + item.name + '」收起來了');
         } else {
-          if (PetState.deco.placed.length >= DECO_SLOTS.length) { alert('家裡放滿了，先收起一個吧！'); return; }
+          if (PetState.deco.placed.length >= DECO_SLOTS.length) { decoTip('家裡放滿了，先收起一個吧！'); return; }
           PetState.deco.placed.push(item.id);
           AudioEngine.playSfx('ding');
+          decoTip('「' + item.name + '」擺出來了！');
         }
         savePet();
+        updateCurrency();
         renderCare('deco');
       };
       grid.appendChild(c);
@@ -671,44 +709,25 @@ function renderCare(tab) {
     p.appendChild(grid);
   }
   if (tab === 'comp') {
-    const note = document.createElement('div');
-    note.style.cssText = 'text-align:center;color:#888;margin-bottom:10px';
-    note.textContent = `選最多 3 位英雄夥伴一起冒險（目前 ${PetState.comp.length}/3）`;
-    p.appendChild(note);
-    const grid = document.createElement('div');
-    grid.className = 'care-grid';
-    heroTheme().words.forEach((w, i) => {
-      const owned = Heroes.owns(i);
-      const sel = PetState.comp.includes(i);
-      const cost = HERO_COST[i] * 3;
-      const c = document.createElement('div');
-      c.className = 'care-card' + (sel ? ' sel' : owned ? ' owned' : '');
-      c.innerHTML = `<img src="assets/img/hero_full_${i}.svg" style="width:80px;height:100px;object-fit:contain">
-        <div class="c-name">${w.zh}</div>
-        <div class="c-price">${sel ? '出戰中 ⚔️' : owned ? '點我出戰' : cost === 0 ? '免費' : '🪙 ' + cost}</div>`;
-      c.onclick = () => {
-        if (!owned) {
-          if (stars < cost) { AudioEngine.playSfx('wrong'); alert('金幣不夠，去冒險賺金幣吧！'); return; }
-          stars -= cost;
-          localStorage.setItem('abc-stars', stars);
-          Heroes.data.owned.push(i);
-          Heroes.save();
-          AudioEngine.playSfx('fanfare');
-          celebrate();
-        } else if (sel) {
-          PetState.comp = PetState.comp.filter(x => x !== i);
-          AudioEngine.playSfx('pop');
-        } else {
-          if (PetState.comp.length >= 3) { alert('最多 3 位夥伴，先換下一位吧！'); return; }
-          PetState.comp.push(i);
-          AudioEngine.playSfx('ding');
-        }
-        savePet();
-        renderCare('comp');
-      };
-      grid.appendChild(c);
-    });
-    p.appendChild(grid);
+    // 上方固定：寵物＋三個出戰位置；下方橫向滑動選英雄替換
+    const top = document.createElement('div');
+    top.id = 'partyPicker';
+    top.innerHTML = `
+      <div class="pp-pet">
+        <img src="${petImgSrc(PetState.active, petData(PetState.active).stage, moodSuffix()) || ''}" alt="pet">
+        <div class="pp-label">${petDef(PetState.active).names[petData(PetState.active).stage]}</div>
+      </div>
+      <div class="pp-slots" id="ppSlots"></div>`;
+    p.appendChild(top);
+    const tip = document.createElement('div');
+    tip.id = 'decoTip';
+    p.appendChild(tip);
+    const rowWrap = document.createElement('div');
+    rowWrap.id = 'heroRowWrap';
+    rowWrap.innerHTML = '<div id="heroRow"></div>';
+    p.appendChild(rowWrap);
+    renderPartySlots();
+    renderHeroRow();
   }
 }
 /* ---- 餵食動畫：食物飛過去 → 寵物咀嚼 → 碎屑噴出 → 飽足度上升 ---- */
@@ -789,6 +808,118 @@ function feedAnim(f, cardEl) {
       feeding = false;
     }, 900);
   }, 620);
+}
+
+/* ---- 組隊：上方三個固定出戰位置 + 下方滑動英雄列 ---- */
+let slotSel = 0;                       // 目前選中的出戰位置（點英雄會放進這格）
+function heroName(i) { return heroTheme().words[i] ? heroTheme().words[i].zh : '?'; }
+function renderPartySlots() {
+  const box = $('ppSlots');
+  if (!box) return;
+  box.innerHTML = '';
+  for (let s = 0; s < 3; s++) {
+    const h = PetState.comp[s];
+    const has = h !== undefined && Heroes.owns(h);
+    const d = document.createElement('div');
+    d.className = 'pp-slot' + (slotSel === s ? ' on' : '') + (has ? ' filled' : '');
+    d.innerHTML = has
+      ? `<img src="assets/img/hero_full_${h}.svg" alt="${heroName(h)}">
+         <div class="pp-label">${heroName(h)}</div>
+         <button class="pp-x" title="換下">✕</button>`
+      : `<div class="pp-empty">＋</div><div class="pp-label">第 ${s + 1} 位</div>`;
+    d.onclick = () => { slotSel = s; renderPartySlots(); renderHeroRow(); };
+    const x = d.querySelector('.pp-x');
+    if (x) x.onclick = (e) => {
+      e.stopPropagation();
+      PetState.comp.splice(s, 1);
+      savePet();
+      AudioEngine.playSfx('pop');
+      slotSel = Math.min(slotSel, PetState.comp.length);
+      renderPartySlots(); renderHeroRow();
+    };
+    box.appendChild(d);
+  }
+}
+function renderHeroRow() {
+  const row = $('heroRow');
+  if (!row) return;
+  row.innerHTML = '';
+  heroTheme().words.forEach((w, i) => {
+    const owned = Heroes.owns(i);
+    const inParty = PetState.comp.indexOf(i);
+    const cost = HERO_COST[i] * 3;
+    const c = document.createElement('div');
+    c.className = 'hero-card' + (inParty >= 0 ? ' sel' : owned ? ' owned' : ' locked');
+    c.innerHTML = `
+      ${inParty >= 0 ? `<span class="hc-badge">${inParty + 1}</span>` : ''}
+      <img src="assets/img/hero_full_${i}.svg" alt="${w.zh}"
+           onerror="this.outerHTML='<div class=hc-fallback>${w.emoji || '🦸'}</div>'">
+      <div class="hc-name">${w.zh}</div>
+      <div class="hc-price">${inParty >= 0 ? '出戰中' : owned ? '點我上場' : '🪙 ' + cost}</div>`;
+    c.onclick = () => {
+      if (!owned) {
+        if (stars < cost) { AudioEngine.playSfx('wrong'); decoTip('金幣不夠，去冒險賺金幣吧！'); return; }
+        stars -= cost;
+        localStorage.setItem('abc-stars', stars);
+        Heroes.data.owned.push(i);
+        Heroes.save();
+        updateCurrency();
+        AudioEngine.playSfx('fanfare');
+        celebrate();
+        decoTip('解鎖「' + w.zh + '」！點一下讓他上場');
+        renderHeroRow();
+        return;
+      }
+      if (inParty >= 0) {                       // 已在隊上 → 收回
+        PetState.comp.splice(inParty, 1);
+        AudioEngine.playSfx('pop');
+      } else {
+        PetState.comp = PetState.comp.filter(x => Heroes.owns(x));
+        if (slotSel < PetState.comp.length) PetState.comp[slotSel] = i;   // 替換該位置
+        else PetState.comp.push(i);
+        PetState.comp = PetState.comp.slice(0, 3);
+        AudioEngine.playSfx('ding');
+        decoTip(w.zh + ' 加入隊伍！');
+        slotSel = Math.min(2, PetState.comp.length);
+      }
+      savePet();
+      renderPartySlots(); renderHeroRow();
+    };
+    row.appendChild(c);
+  });
+}
+
+/* ---- 裝飾：房間即時預覽 ---- */
+function decoTip(msg) {
+  const t = $('decoTip');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function paintDecoPreview() {
+  const box = $('decoWorld');
+  if (!box) return;
+  const pd = petData(PetState.active);
+  const src = petImgSrc(PetState.active, pd.stage, moodSuffix());
+  let html = '';
+  FURNITURE.forEach(f => {
+    html += `<span class="furn" style="left:${f.x}px;top:${f.yb - f.s}px;font-size:${f.s}px">${f.icon}</span>`;
+  });
+  PetState.deco.placed.slice(0, DECO_SLOTS.length).forEach((id, k) => {
+    const item = DECO_ITEMS.find(x => x.id === id);
+    if (!item) return;
+    const s = DECO_SLOTS[k];
+    html += `<span class="deco-item" style="left:${s.x}px;top:${s.yb - DECO_SIZE}px;font-size:${DECO_SIZE}px">${item.icon}</span>`;
+  });
+  if (src) html += `<img class="prev-pet" src="${src}" alt="pet">`;
+  box.innerHTML = html;
+  // 依容器寬度縮放整個 1200x640 房間
+  const prev = $('decoPreview');
+  const scale = prev.clientWidth / WORLD.w;
+  box.style.transform = `scale(${scale})`;
+  prev.style.height = (WORLD.h * scale) + 'px';
 }
 
 function doEvolve() {

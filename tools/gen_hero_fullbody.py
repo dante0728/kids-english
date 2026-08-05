@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-20 位英雄的全身 Q 版動畫 SVG（星星商店/打怪獸用）。
+30 位英雄的全身 Q 版動畫 SVG（星星商店/打怪獸用）。
 粗黑邊扁平風、viewBox 320x460、CSS 動畫內嵌（<img> 載入也會動）。
 輸出：assets/img/hero_full_{i}.svg（編號同 words.js 英雄關順序）
 用法：python tools/gen_hero_fullbody.py
@@ -83,7 +83,7 @@ def eyes(y=130, dx=26, r=8):
 def smile(y=168):
     return f'<path d="M136 {y} Q160 {y+16} 184 {y}" fill="none" {S}/>'
 
-H = [None] * 20
+H = [None] * 30
 
 # 0 鋼鐵人：懸浮＋噴射
 H[0] = svg(
@@ -393,11 +393,159 @@ H[19] = svg(
     + f'<circle cx="196" cy="128" r="17" fill="#c8102e" {St}/><circle cx="196" cy="128" r="6" fill="#ff8fa3"/>'
     + f'<path d="M132 174 Q146 184 160 178" fill="none" {S}/><path d="M170 180 L204 180" stroke="#4a525c" stroke-width="5" stroke-linecap="round"/>')
 
+# 20 洛基：金角頭盔＋綠披風
+H[20] = svg(
+    f'<path class="cape" d="M118 228 Q102 320 88 406 Q160 384 232 406 Q218 320 202 228 Z" fill="#1f6b3a" {S}/>'
+    + legs('#20232a', '#2a7d4f') + arms('#2a7d4f')
+    + torso('#2a7d4f',
+        f'<path d="M160 234 L180 260 L160 286 L140 260 Z" fill="#f2a900" {St}/>'
+        f'<path d="M120 236 L138 320 M200 236 L182 320" stroke="#f2a900" stroke-width="6" fill="none"/>'
+        f'<rect x="118" y="304" width="84" height="14" rx="7" fill="#f2a900" {St}/>')
+    + f'<path d="M112 72 Q76 40 82 6 Q112 34 130 62 Z" fill="#f2a900" {S}/>'
+    + f'<path d="M208 72 Q244 40 238 6 Q208 34 190 62 Z" fill="#f2a900" {S}/>'
+    + head('#f6c99f')
+    + f'<path d="M84 140 Q80 58 160 54 Q240 58 236 140 Q222 92 160 88 Q98 92 84 140 Z" fill="#20232a" {S}/>'
+    + f'<path d="M96 108 Q160 78 224 108 L220 128 Q160 100 100 128 Z" fill="#f2a900" {S}/>'
+    + eyes(y=144)
+    + f'<path d="M136 176 Q160 192 186 170" fill="none" {S}/>')
+
+# 21 幻視：額頭寶石發光＋懸浮
+H[21] = svg(
+    f'<path class="cape" d="M118 228 Q100 320 84 408 Q160 386 236 408 Q220 320 202 228 Z" fill="#2a7d4f" {S}/>'
+    + legs('#c8102e', '#f2a900') + arms('#c8102e')
+    + torso('#c8102e',
+        f'<path d="M118 226 Q160 214 202 226 L206 264 Q160 278 114 264 Z" fill="#f2a900" {St}/>'
+        f'<line x1="160" y1="278" x2="160" y2="322" stroke="#f2a900" stroke-width="6"/>')
+    + head('#c8102e')
+    + f'<path d="M84 122 Q92 58 160 54 Q228 58 236 122 Q218 88 160 84 Q102 88 84 122 Z" fill="#f2a900" {S}/>'
+    + f'<path d="M78 134 L110 114 L110 154 Z" fill="#f2a900" {St}/>'
+    + f'<path d="M242 134 L210 114 L210 154 Z" fill="#f2a900" {St}/>'
+    + f'<circle class="glowp" cx="160" cy="96" r="17" fill="#ffd60a"/>'
+    + f'<circle cx="160" cy="96" r="9" fill="#fff8c4" {St}/>'
+    + f'<circle cx="134" cy="146" r="8" fill="#fff"/><circle cx="186" cy="146" r="8" fill="#fff"/>'
+    + smile(180), anim='hover')
+
+# 22 緋紅女巫：雙手紅色魔法光暈
+H[22] = svg(
+    f'<path class="cape" d="M116 228 Q98 322 82 404 Q160 384 238 404 Q222 322 204 228 Z" fill="#7a1220" {S}/>'
+    + legs('#7a1220', '#c8102e') + arms('#c8102e', 30)
+    + f'<circle class="glowp" cx="70" cy="330" r="22" fill="#e63946" opacity=".85"/>'
+    + f'<circle class="glowp" cx="250" cy="330" r="22" fill="#e63946" opacity=".85" style="animation-delay:.4s"/>'
+    + torso('#c8102e',
+        f'<path d="M118 226 Q160 242 202 226 L204 256 Q160 272 116 256 Z" fill="#7a1220" {St}/>'
+        f'<rect x="120" y="302" width="80" height="14" rx="7" fill="#7a1220" {St}/>')
+    + f'<path d="M78 152 Q64 54 160 44 Q256 54 242 152 Q248 224 226 254 Q234 168 226 128 L94 128 Q86 168 94 254 Q72 224 78 152 Z" fill="#7a1220" {S}/>'
+    + head('#f6c99f', cy=132, r=72)
+    + f'<path d="M102 98 L122 68 L141 94 L160 62 L179 94 L198 68 L218 98 Q160 78 102 98 Z" fill="#c8102e" {St}/>'
+    + eyes(y=136, dx=24) + smile(172))
+
+# 23 獵鷹：機械翅膀展開
+H[23] = svg(
+    f'<g class="cape">'
+    f'<path d="M118 236 Q58 202 14 226 Q58 238 78 254 Q32 252 8 278 Q54 284 86 290 Q48 302 32 332 Q92 314 126 292 Z" fill="#e9ecef" {S}/>'
+    f'<path d="M202 236 Q262 202 306 226 Q262 238 242 254 Q288 252 312 278 Q266 284 234 290 Q272 302 288 332 Q228 314 194 292 Z" fill="#e9ecef" {S}/>'
+    f'</g>'
+    + legs('#20232a', '#c8102e') + arms('#c8102e', 22)
+    + torso('#c8102e',
+        f'<path d="M126 228 Q160 240 194 228 L198 288 Q160 302 122 288 Z" fill="#e9ecef" {St}/>'
+        f'<rect x="118" y="302" width="84" height="14" rx="7" fill="#20232a" {St}/>')
+    + head('#c8102e')
+    + f'<path d="M84 118 Q84 56 160 52 Q236 56 236 118 Q208 88 160 88 Q112 88 84 118 Z" fill="#e9ecef" {S}/>'
+    + f'<path d="M88 122 Q160 102 232 122 L232 156 Q160 136 88 156 Z" fill="#20232a" {S}/>'
+    + f'<ellipse cx="130" cy="134" rx="20" ry="12" fill="#7fd8ff" {St}/>'
+    + f'<ellipse cx="190" cy="134" rx="20" ry="12" fill="#7fd8ff" {St}/>'
+    + smile(180))
+
+# 24 星爵：紅色長外套飄動
+H[24] = svg(
+    f'<path class="cape" d="M112 226 Q96 330 88 412 L124 398 L160 412 L196 398 L232 412 Q224 330 208 226 Z" fill="#a4243b" {S}/>'
+    + legs('#3a3f47', '#5a3d2b') + arms('#a4243b', 20)
+    + torso('#8d99ae',
+        f'<path d="M134 246 L186 246 M130 274 L190 274" stroke="#4a525c" stroke-width="5"/>'
+        f'<rect x="120" y="300" width="80" height="16" rx="8" fill="#5a3d2b" {St}/>')
+    + head('#f6c99f')
+    + f'<path d="M84 118 Q84 56 160 52 Q236 56 236 118 Q212 86 160 86 Q108 86 84 118 Z" fill="#6b4423" {S}/>'
+    + f'<path d="M86 124 Q160 100 234 124 L230 172 Q160 148 90 172 Z" fill="#b0b7bf" {S}/>'
+    + f'<path d="M100 132 Q160 112 220 132 L218 156 Q160 136 102 156 Z" fill="#c8102e" {St}/>'
+    + f'<circle cx="132" cy="138" r="8" fill="#ff8fa3"/><circle cx="188" cy="138" r="8" fill="#ff8fa3"/>'
+    + smile(186))
+
+# 25 羅賓：黃色披風＋胸前 R
+H[25] = svg(
+    f'<path class="cape" d="M118 228 Q102 320 88 406 Q160 384 232 406 Q218 320 202 228 Z" fill="#f2a900" {S}/>'
+    + legs('#2a9d3f', '#1f6b3a') + arms('#2a9d3f')
+    + torso('#c8102e',
+        f'<circle cx="160" cy="260" r="24" fill="#f2a900" {St}/>'
+        f'<text x="160" y="272" font-family="Arial Black,Arial" font-size="30" font-weight="900" fill="#c8102e" text-anchor="middle">R</text>'
+        f'<rect x="118" y="300" width="84" height="16" rx="8" fill="#2a9d3f" {St}/>')
+    + head('#f6c99f')
+    + f'<path d="M84 118 Q84 56 160 52 Q236 56 236 118 Q212 84 160 84 Q108 84 84 118 Z" fill="#20232a" {S}/>'
+    + f'<path d="M88 124 Q160 104 232 124 L232 154 Q160 134 88 154 Z" fill="#1a1a1a" {S}/>'
+    + f'<circle cx="132" cy="136" r="9" fill="#fff"/><circle cx="188" cy="136" r="9" fill="#fff"/>'
+    + smile(180))
+
+# 26 女超人：紅披風＋懸浮
+H[26] = svg(
+    f'<path class="cape" d="M118 228 Q100 320 84 408 Q160 386 236 408 Q220 320 202 228 Z" fill="#c8102e" {S}/>'
+    + legs('#1446a0', '#c8102e') + arms('#1446a0')
+    + torso('#1446a0',
+        f'<path d="M160 238 L192 252 L160 288 L128 252 Z" fill="#c8102e" {St}/>'
+        f'<text x="160" y="272" font-family="Arial Black,Arial" font-size="26" font-weight="900" fill="#f2a900" text-anchor="middle">S</text>'
+        f'<rect x="118" y="304" width="84" height="14" rx="7" fill="#f2a900" {St}/>')
+    + f'<path d="M78 152 Q64 54 160 44 Q256 54 242 152 Q248 226 226 256 Q234 168 226 128 L94 128 Q86 168 94 256 Q72 226 78 152 Z" fill="#f2c14e" {S}/>'
+    + head('#f6c99f', cy=132, r=72)
+    + eyes(y=136, dx=24) + smile(172), anim='hover')
+
+# 27 綠箭俠：拉弓
+H[27] = svg(
+    legs('#1f6b3a', '#2a7d4f') + arm_left('#2a9d3f', 30)
+    + f'<rect x="212" y="216" width="30" height="80" rx="15" fill="#2a9d3f" {S} transform="rotate(-80 227 223)"/>'
+    + f'<path d="M264 178 Q308 260 264 342" fill="none" stroke="#2a9d3f" stroke-width="9" stroke-linecap="round"/>'
+    + f'<line x1="266" y1="182" x2="266" y2="338" stroke="#e9ecef" stroke-width="4"/>'
+    + f'<line class="shimmer" x1="202" y1="260" x2="292" y2="260" stroke="#c0c6cf" stroke-width="6" stroke-linecap="round"/>'
+    + f'<path class="shimmer" d="M292 260 L278 250 M292 260 L278 270" stroke="#c0c6cf" stroke-width="6" fill="none" stroke-linecap="round"/>'
+    + torso('#2a9d3f',
+        f'<path d="M130 246 L160 266 L190 246" fill="none" stroke="#1f6b3a" stroke-width="6"/>'
+        f'<rect x="120" y="300" width="80" height="14" rx="7" fill="#5a3d2b" {St}/>')
+    + f'<path d="M74 148 Q60 52 160 44 Q260 52 246 148 Q238 208 216 236 Q228 168 220 128 L100 128 Q92 168 104 236 Q82 208 74 148 Z" fill="#1f6b3a" {S}/>'
+    + head('#f6c99f', cy=134, r=68)
+    + f'<path d="M98 122 Q160 104 222 122 L220 148 Q160 130 100 148 Z" fill="#2a9d3f" {S}/>'
+    + f'<circle cx="132" cy="132" r="8" fill="#fff"/><circle cx="188" cy="132" r="8" fill="#fff"/>'
+    + f'<path d="M132 166 Q146 158 160 164 Q174 158 188 166 Q182 194 160 196 Q138 194 132 166 Z" fill="#f2c14e" {St}/>')
+
+# 28 沙贊：白披風＋金色閃電
+H[28] = svg(
+    f'<path class="cape" d="M118 228 Q100 320 84 408 Q160 386 236 408 Q220 320 202 228 Z" fill="#fff" {S}/>'
+    + legs('#c8102e', '#f2a900') + arms('#c8102e')
+    + torso('#c8102e',
+        f'<path d="M176 234 L138 286 L158 286 L146 314 L188 266 L166 266 Z" fill="#f2a900" {St}/>'
+        f'<rect x="118" y="304" width="84" height="14" rx="7" fill="#f2a900" {St}/>')
+    + f'<path class="zapflick" d="M258 56 L272 92 L256 92 L270 128" fill="none" stroke="#ffd60a" stroke-width="7" stroke-linecap="round"/>'
+    + head('#f6c99f')
+    + f'<path d="M84 116 Q84 56 160 52 Q236 56 236 116 Q212 84 160 84 Q108 84 84 116 Z" fill="#20232a" {S}/>'
+    + eyes() + smile())
+
+# 29 夜翼：雙棍＋藍色鳥紋
+H[29] = svg(
+    legs('#20232a', '#1a3f6b') + arms('#20232a', 26)
+    + f'<g class="shimmer">'
+    + f'<line x1="52" y1="296" x2="52" y2="362" stroke="#2f7fe0" stroke-width="10" stroke-linecap="round"/>'
+    + f'<line x1="268" y1="296" x2="268" y2="362" stroke="#2f7fe0" stroke-width="10" stroke-linecap="round"/></g>'
+    + torso('#20232a',
+        f'<path d="M160 246 Q134 238 112 256 Q140 252 152 264 L160 280 L168 264 Q180 252 208 256 Q186 238 160 246 Z" fill="#2f7fe0" {St}/>'
+        f'<rect x="120" y="302" width="80" height="14" rx="7" fill="#1a3f6b" {St}/>')
+    + head('#f6c99f')
+    + f'<path d="M84 118 Q84 56 160 52 Q236 56 236 118 Q212 84 160 84 Q108 84 84 118 Z" fill="#20232a" {S}/>'
+    + f'<path d="M90 124 Q160 104 230 124 L230 154 Q160 134 90 154 Z" fill="#1a1a1a" {S}/>'
+    + f'<path d="M104 130 L136 138 L132 152 L102 144 Z" fill="#fff" {St}/>'
+    + f'<path d="M216 130 L184 138 L188 152 L218 144 Z" fill="#fff" {St}/>'
+    + f'<path d="M138 180 L182 180" {S}/>')
+
 def main():
     for i, s in enumerate(H):
         with open(os.path.join(OUT, f'hero_full_{i}.svg'), 'w', encoding='utf-8') as f:
             f.write(s)
-    print('done: 20 full-body hero SVGs')
+    print('done: %d full-body hero SVGs' % len(H))
 
 if __name__ == '__main__':
     main()

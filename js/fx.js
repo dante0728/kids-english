@@ -235,7 +235,10 @@ const Fx = (() => {
   // 英雄索引 → 技能（對應 words.js 英雄關順序）
   const HERO_SKILL = ['repulsor', 'web', 'shieldthrow', 'smash', 'thunder', 'claw',
     'starburst', 'mandala', 'arrow', 'swarm', 'vine', 'rocketgun', 'claw',
-    'heatvision', 'batarang', 'lasso', 'speedforce', 'tidal', 'lantern', 'plasma'];
+    'heatvision', 'batarang', 'lasso', 'speedforce', 'tidal', 'lantern', 'plasma',
+    // 20-29
+    'mandala', 'plasma', 'mandala', 'arrow', 'starburst',
+    'batarang', 'heatvision', 'arrow', 'thunder', 'claw'];
   const PET_SKILL = { dino: 'flame', aqua: 'aqua', leaf: 'leafblade' };
 
   function skillOf(kind, id, stage) {

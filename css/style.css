@@ -295,13 +295,14 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 #expBarBox { flex: 1; height: 14px; background: #eee; border-radius: 999px; overflow: hidden; }
 #expBar { height: 100%; width: 0%; background: linear-gradient(90deg, #ffd60a, #ff9f1c);
   border-radius: 999px; transition: width .5s; }
-#mainNav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%;
-  max-width: 560px; margin-top: 14px; }
-.nav-btn { font-family: inherit; font-size: 1.15rem; font-weight: bold; color: #333;
-  background: #fff; border: 4px solid var(--c); border-radius: 20px; padding: 12px 4px;
+#mainNav { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%;
+  max-width: 860px; margin-top: 14px; }
+.nav-btn { font-family: inherit; font-size: 1rem; font-weight: bold; color: #333;
+  background: #fff; border: 4px solid var(--c); border-radius: 18px; padding: 10px 2px;
   cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,.15); transition: transform .12s;
   display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.nav-btn span { font-size: 1.9rem; }
+.nav-btn span { font-size: 1.7rem; }
+@media (max-width: 700px) { #mainNav { grid-template-columns: repeat(4, 1fr); } }
 .nav-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.15); }
 
 /* ===== 學習選單 ===== */
@@ -347,6 +348,56 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 .care-card.owned { border-color: #4ecdc4; }
 .care-card.placed { border-color: #ffb703; background: #fff8e2; }
 .care-card.sel { border-color: #ff6b9d; background: #ffeef5; }
+/* ===== 組隊：固定出戰位 + 滑動英雄列 ===== */
+#partyPicker { display: flex; align-items: flex-end; gap: 14px; background: #fff;
+  border-radius: 20px; padding: 12px 14px; box-shadow: 0 5px 0 rgba(0,0,0,.12); }
+.pp-pet { text-align: center; flex-shrink: 0; }
+.pp-pet img { width: 84px; height: 96px; object-fit: contain; }
+.pp-label { font-size: .82rem; color: #666; margin-top: 2px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 92px; }
+.pp-slots { display: flex; gap: 10px; flex: 1; justify-content: center; }
+.pp-slot { position: relative; width: 92px; padding: 6px 4px; text-align: center;
+  border: 4px dashed #ddd; border-radius: 16px; cursor: pointer; background: #fafafa; }
+.pp-slot.filled { border-style: solid; border-color: #4ecdc4; background: #fff; }
+.pp-slot.on { border-color: #ff6b9d; background: #fff2f7; box-shadow: 0 0 0 3px rgba(255,107,157,.25); }
+.pp-slot img { width: 62px; height: 78px; object-fit: contain; }
+.pp-empty { font-size: 2.4rem; color: #ccc; line-height: 78px; }
+.pp-x { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid #e74c3c; background: #fff; color: #e74c3c; font-size: .85rem; cursor: pointer; }
+#heroRowWrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 12px;
+  padding-bottom: 8px; }
+#heroRow { display: flex; gap: 10px; padding: 2px; }
+.hero-card { position: relative; flex: 0 0 108px; background: #fff; border-radius: 16px;
+  border: 4px solid #ddd; padding: 8px 4px; text-align: center; cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0,0,0,.1); }
+.hero-card:active { transform: scale(.96); }
+.hero-card img, .hc-fallback { width: 74px; height: 92px; object-fit: contain; }
+.hc-fallback { font-size: 3rem; line-height: 92px; }
+.hero-card.locked img { filter: grayscale(1) brightness(.62); }
+.hero-card.owned { border-color: #4ecdc4; }
+.hero-card.sel { border-color: #ff6b9d; background: #fff2f7; }
+.hc-name { font-weight: bold; font-size: .92rem; color: #333; }
+.hc-price { font-size: .82rem; color: #b8860b; }
+.hc-badge { position: absolute; top: -6px; left: -6px; width: 24px; height: 24px;
+  border-radius: 50%; background: #ff6b9d; color: #fff; font-size: .85rem; line-height: 24px;
+  font-weight: bold; }
+#decoTip { text-align: center; color: #666; min-height: 1.4rem; margin: 8px 0; opacity: 0;
+  transition: opacity .2s; }
+#decoTip.show { opacity: 1; }
+
+/* ===== 裝飾：房間預覽 ===== */
+#decoPreview { position: relative; width: 100%; overflow: hidden; border: 4px solid #b98a3e;
+  border-radius: 18px; background: #cdeffd; }
+#decoWorld { position: absolute; left: 0; top: 0; width: 1200px; height: 640px;
+  transform-origin: top left;
+  background: linear-gradient(180deg, #cdeffd 0%, #e3f6ff 40%, #f6efd9 62%, #ffe8b3 63%, #ffd98a 100%); }
+#decoWorld .prev-pet { position: absolute; left: 490px; top: 385px; width: 200px; height: 200px; }
+.deco-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.deco-card { padding: 10px 6px; }
+.deco-card .c-icon { font-size: 2.1rem; }
+.deco-card .c-name { font-size: .88rem; }
+.deco-card .c-price { font-size: .8rem; }
+
 /* ===== 餵食動畫 ===== */
 #feedStage { position: relative; text-align: center; background: #fff; border-radius: 22px;
   padding: 14px; margin-bottom: 14px; box-shadow: 0 6px 0 rgba(0,0,0,.12); overflow: hidden; }

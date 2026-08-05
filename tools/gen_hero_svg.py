@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-手繪 20 個超級英雄卡通頭像 SVG（配合 OpenMoji 的粗線條扁平風格）。
+手繪 30 個超級英雄卡通頭像 SVG（配合 OpenMoji 的粗線條扁平風格）。
 原創簡化造型，非官方素材。輸出：assets/img/heroes_{i}.svg
 用法：python tools/gen_hero_svg.py
 """
@@ -228,6 +228,123 @@ HEROES.append(wrap(
     f'<circle cx="206" cy="166" r="7" fill="#ff8fa3"/>' +
     f'<path d="M186 220 Q200 232 220 228 M186 246 L224 246" fill="none" {Sthin}/>' +
     f'<path d="M122 226 Q140 238 158 230" fill="none" {S}/>'
+))
+
+# 20 Loki 洛基：綠衣金飾、金色雙角頭盔、黑髮、狡黠微笑
+HEROES.append(wrap(
+    f'<path d="M112 96 Q70 56 78 12 Q112 48 132 84 Z" fill="#f2a900" {S}/>' +
+    f'<path d="M208 96 Q250 56 242 12 Q208 48 188 84 Z" fill="#f2a900" {S}/>' +
+    head('#f6c99f') +
+    f'<path d="M62 176 Q58 84 160 78 Q262 84 258 176 Q244 118 160 114 Q76 118 62 176 Z" fill="#20232a" {S}/>' +
+    f'<path d="M84 136 Q160 102 236 136 L232 158 Q160 124 88 158 Z" fill="#f2a900" {S}/>' +
+    f'<circle cx="128" cy="184" r="9" fill="#1a1a1a"/><circle cx="192" cy="184" r="9" fill="#1a1a1a"/>' +
+    f'<path d="M130 228 Q160 246 192 220" fill="none" {S}/>' +
+    f'<path d="M70 268 Q160 240 250 268 L250 312 Q160 284 70 312 Z" fill="#2a7d4f" {Sthin}/>' +
+    f'<path d="M124 282 L160 262 L196 282" fill="none" stroke="#f2a900" stroke-width="7" stroke-linecap="round"/>'
+))
+# 21 Vision 幻視：紅臉、額頭黃寶石、金色頭飾、綠披肩
+HEROES.append(wrap(
+    f'<path d="M52 250 L96 200 L120 268 Z" fill="#2a7d4f" {S}/>' +
+    f'<path d="M268 250 L224 200 L200 268 Z" fill="#2a7d4f" {S}/>' +
+    head('#c8102e') +
+    f'<path d="M70 140 Q78 76 160 72 Q242 76 250 140 Q232 104 160 100 Q88 104 70 140 Z" fill="#f2a900" {S}/>' +
+    f'<path d="M64 172 L98 148 L98 196 Z" fill="#f2a900" {Sthin}/>' +
+    f'<path d="M256 172 L222 148 L222 196 Z" fill="#f2a900" {Sthin}/>' +
+    f'<circle cx="160" cy="134" r="34" fill="none" stroke="#ffd60a" stroke-width="4" stroke-dasharray="6 9"/>' +
+    f'<circle cx="160" cy="134" r="21" fill="#ffd60a" {Sthin}/>' +
+    f'<circle cx="160" cy="134" r="9" fill="#fff8c4"/>' +
+    f'<circle cx="128" cy="190" r="10" fill="#fff"/><circle cx="192" cy="190" r="10" fill="#fff"/>' +
+    f'<path d="M132 234 Q160 248 188 234" fill="none" {S}/>'
+))
+# 22 Scarlet Witch 緋紅女巫：紅衣、深紅長髮、紅色頭飾、紅色魔法光暈
+HEROES.append(wrap(
+    f'<path d="M62 206 Q46 96 160 66 Q274 96 258 206 Q264 258 240 284 Q246 214 238 172 L82 172 Q74 214 80 284 Q56 258 62 206 Z" fill="#7a1220" {S}/>' +
+    f'<circle cx="160" cy="180" r="80" fill="#f6c99f" {S}/>' +
+    f'<path d="M96 132 L120 96 L140 126 L160 88 L180 126 L200 96 L224 132 Q160 108 96 132 Z" fill="#c8102e" {Sthin}/>' +
+    f'<circle cx="132" cy="182" r="9" fill="#1a1a1a"/><circle cx="188" cy="182" r="9" fill="#1a1a1a"/>' +
+    f'<path d="M134 224 Q160 240 186 224" fill="none" {S}/>' +
+    f'<circle cx="48" cy="268" r="24" fill="#e63946" opacity="0.85" {Sthin}/>' +
+    f'<circle cx="48" cy="268" r="36" fill="none" stroke="#ff8fa3" stroke-width="4" stroke-dasharray="6 10"/>' +
+    f'<circle cx="272" cy="268" r="24" fill="#e63946" opacity="0.85" {Sthin}/>' +
+    f'<circle cx="272" cy="268" r="36" fill="none" stroke="#ff8fa3" stroke-width="4" stroke-dasharray="6 10"/>'
+))
+# 23 Falcon 獵鷹：紅白配色、護目鏡、灰白機械翅膀
+HEROES.append(wrap(
+    f'<path d="M104 108 Q46 100 22 156 Q56 138 96 148 Q46 168 30 216 Q70 180 108 186 Z" fill="#e9ecef" {S}/>' +
+    f'<path d="M216 108 Q274 100 298 156 Q264 138 224 148 Q274 168 290 216 Q250 180 212 186 Z" fill="#e9ecef" {S}/>' +
+    head('#c8102e') +
+    f'<path d="M64 158 Q64 86 160 82 Q256 86 256 158 Q220 118 160 118 Q100 118 64 158 Z" fill="#e9ecef" {S}/>' +
+    f'<path d="M74 154 Q160 132 246 154 L246 190 Q160 168 74 190 Z" fill="#20232a" {S}/>' +
+    f'<ellipse cx="124" cy="166" rx="22" ry="13" fill="#7fd8ff" {Sthin}/>' +
+    f'<ellipse cx="196" cy="166" rx="22" ry="13" fill="#7fd8ff" {Sthin}/>' +
+    f'<path d="M132 230 Q160 246 188 230" fill="none" {S}/>'
+))
+# 24 Star-Lord 星爵：紅色長外套、銀色面罩紅眼罩、棕髮
+HEROES.append(wrap(
+    head('#f6c99f') +
+    f'<path d="M64 148 Q64 74 160 70 Q256 74 256 148 Q232 104 160 104 Q88 104 64 148 Z" fill="#6b4423" {S}/>' +
+    f'<path d="M66 152 Q160 126 254 152 L250 198 Q160 174 70 198 Z" fill="#b0b7bf" {S}/>' +
+    f'<path d="M84 158 Q160 138 236 158 L234 182 Q160 162 86 182 Z" fill="#c8102e" {Sthin}/>' +
+    f'<circle cx="126" cy="166" r="9" fill="#ff8fa3"/><circle cx="194" cy="166" r="9" fill="#ff8fa3"/>' +
+    f'<path d="M132 230 Q160 246 188 230" fill="none" {S}/>' +
+    f'<path d="M70 268 Q160 244 250 268 L250 312 Q160 288 70 312 Z" fill="#a4243b" {S}/>' +
+    f'<path d="M160 262 L160 312" stroke="#7a1220" stroke-width="6" stroke-linecap="round"/>'
+))
+# 25 Robin 羅賓：紅綠黃配色、黑眼罩、黑短髮、胸前 R
+HEROES.append(wrap(
+    head('#f6c99f') +
+    f'<path d="M64 140 Q68 72 160 68 Q252 72 256 140 Q228 100 160 100 Q92 100 64 140 Z" fill="#20232a" {S}/>' +
+    f'<path d="M74 150 Q160 128 246 150 L246 184 Q160 162 74 184 Z" fill="#1a1a1a" {S}/>' +
+    f'<circle cx="126" cy="162" r="11" fill="#fff"/><circle cx="194" cy="162" r="11" fill="#fff"/>' +
+    f'<path d="M130 228 Q160 244 190 228" fill="none" {S}/>' +
+    f'<path d="M64 272 Q160 246 256 272 L256 312 Q160 286 64 312 Z" fill="#f2a900" {S}/>' +
+    f'<path d="M64 314 Q160 288 256 314" fill="none" stroke="#2a9d3f" stroke-width="9" stroke-linecap="round"/>' +
+    f'<circle cx="160" cy="290" r="28" fill="#c8102e" {Sthin}/>' +
+    f'<text x="160" y="304" font-family="Arial Black,Arial" font-size="32" font-weight="900" fill="#f2a900" text-anchor="middle">R</text>'
+))
+# 26 Supergirl 女超人：藍衣紅披風、金色長髮、胸前紅黃盾徽
+HEROES.append(wrap(
+    f'<path d="M62 210 Q46 90 160 64 Q274 90 258 210 Q250 258 224 274 Q238 200 230 160 L90 160 Q82 200 96 274 Q70 258 62 210 Z" fill="#f2c14e" {S}/>' +
+    f'<circle cx="160" cy="180" r="78" fill="#f6c99f" {S}/>' +
+    f'<circle cx="132" cy="174" r="9" fill="#1a1a1a"/><circle cx="188" cy="174" r="9" fill="#1a1a1a"/>' +
+    f'<path d="M134 216 Q160 232 186 216" fill="none" {S}/>' +
+    f'<path d="M54 306 L96 258 L122 320 Z" fill="#c8102e" {Sthin}/>' +
+    f'<path d="M266 306 L224 258 L198 320 Z" fill="#c8102e" {Sthin}/>' +
+    f'<path d="M96 268 Q160 248 224 268 L224 320 L96 320 Z" fill="#1446a0" {Sthin}/>' +
+    f'<path d="M160 266 L194 280 L160 316 L126 280 Z" fill="#c8102e" {Sthin}/>' +
+    f'<text x="160" y="300" font-family="Arial Black,Arial" font-size="30" font-weight="900" fill="#f2a900" text-anchor="middle">S</text>'
+))
+# 27 Green Arrow 綠箭俠：深綠連帽、綠色眼罩、金色鬍子、弓
+HEROES.append(wrap(
+    f'<path d="M60 202 Q46 84 160 58 Q274 84 260 202 Q252 252 226 272 Q240 196 232 154 L88 154 Q80 196 94 272 Q68 252 60 202 Z" fill="#1f6b3a" {S}/>' +
+    f'<circle cx="160" cy="182" r="72" fill="#f6c99f" {S}/>' +
+    f'<path d="M92 164 Q160 144 228 164 L226 192 Q160 172 94 192 Z" fill="#2a9d3f" {S}/>' +
+    f'<circle cx="128" cy="174" r="9" fill="#fff"/><circle cx="192" cy="174" r="9" fill="#fff"/>' +
+    f'<path d="M130 212 Q146 204 160 210 Q174 204 190 212 Q184 244 160 248 Q136 244 130 212 Z" fill="#f2c14e" {Sthin}/>' +
+    f'<path d="M254 200 Q294 250 254 300" fill="none" stroke="#2a9d3f" stroke-width="9" stroke-linecap="round"/>' +
+    f'<line x1="256" y1="202" x2="256" y2="298" stroke="#e9ecef" stroke-width="5"/>'
+))
+# 28 Shazam 沙贊：紅衣白披風、胸前金色閃電、黑髮
+HEROES.append(wrap(
+    head('#f6c99f') +
+    f'<path d="M64 144 Q64 70 160 66 Q256 70 256 144 Q230 100 160 100 Q90 100 64 144 Z" fill="#20232a" {S}/>' +
+    f'<circle cx="128" cy="176" r="9" fill="#1a1a1a"/><circle cx="192" cy="176" r="9" fill="#1a1a1a"/>' +
+    f'<path d="M130 224 Q160 242 190 224" fill="none" {S}/>' +
+    f'<path d="M48 302 L98 256 L126 320 Z" fill="#fff" {S}/>' +
+    f'<path d="M272 302 L222 256 L194 320 Z" fill="#fff" {S}/>' +
+    f'<path d="M98 268 Q160 248 222 268 L222 320 L98 320 Z" fill="#c8102e" {Sthin}/>' +
+    f'<path d="M178 262 L142 302 L162 302 L150 320 L190 288 L168 288 Z" fill="#f2a900" {Sthin}/>'
+))
+# 29 Nightwing 夜翼：黑衣、胸前藍色鳥形紋、黑眼罩、黑髮
+HEROES.append(wrap(
+    head('#f6c99f') +
+    f'<path d="M64 140 Q68 72 160 68 Q252 72 256 140 Q228 100 160 100 Q92 100 64 140 Z" fill="#20232a" {S}/>' +
+    f'<path d="M74 150 Q160 128 246 150 L246 184 Q160 162 74 184 Z" fill="#1a1a1a" {S}/>' +
+    f'<path d="M96 160 L134 168 L130 182 L94 174 Z" fill="#fff" {Sthin}/>' +
+    f'<path d="M224 160 L186 168 L190 182 L226 174 Z" fill="#fff" {Sthin}/>' +
+    f'<path d="M132 230 L188 230" {S}/>' +
+    f'<path d="M64 272 Q160 246 256 272 L256 320 L64 320 Z" fill="#20232a" {S}/>' +
+    f'<path d="M160 280 Q126 270 94 294 Q132 288 150 302 L160 318 L170 302 Q188 288 226 294 Q194 270 160 280 Z" fill="#2f7fe0" {Sthin}/>'
 ))
 
 def main():
