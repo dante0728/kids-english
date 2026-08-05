@@ -85,8 +85,13 @@ function updateCurrency() {
   $('starCount').textContent = stars;
   $('heartCount').textContent = PetState.hearts + '/' + FULL_MAX;
 }
+// 寵物說話：家長/小朋友自己錄的優先，其次內建語音，最後才用瀏覽器合成
+function petLineSrc(i) {
+  const rec = (Custom.data.petLines || {})[i];
+  return rec || ('assets/voice/pet_line_' + i + '.mp3');
+}
 function playPetLine(i) {
-  playFile('assets/voice/pet_line_' + i + '.mp3', null, () => speakZh(PET_LINES[i]));
+  playFile(petLineSrc(i), null, () => speakZh(PET_LINES[i]));
 }
 let bubbleTimer = null;
 function showBubble(text, ms = 2600) {
@@ -810,6 +815,53 @@ function feedAnim(f, cardEl) {
   }, 620);
 }
 
+/* ---- 家長：寵物說話錄音（用真人聲音取代合成語音） ---- */
+function renderPetLineRecorder(box) {
+  const sec = document.createElement('div');
+  sec.className = 'prow';
+  sec.style.cssText = 'padding:14px;display:block';
+  const custom = Custom.data.petLines || {};
+  const done = Object.keys(custom).length;
+  sec.innerHTML = `
+    <b>🎙️ 寵物說話錄音</b>
+    <div style="color:#888;font-size:.88rem;margin:6px 0 10px">
+      讓小朋友自己錄這 12 句，寵物就會用他的聲音說話（最自然！）。
+      已錄 ${done}/${PET_LINES.length} 句，沒錄的會用內建語音。
+    </div>
+    <div id="petLineList"></div>`;
+  box.appendChild(sec);
+  const list = sec.querySelector('#petLineList');
+  PET_LINES.forEach((line, i) => {
+    const has = !!custom[i];
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;'
+                      + 'border-top:1px solid #f0f0f0';
+    row.innerHTML = `
+      <span style="flex:1;min-width:160px;font-size:.95rem">
+        ${has ? '🎤' : '🔈'} ${line}
+      </span>
+      <button class="pbtn">▶ 試聽</button>
+      <button class="pbtn rec" data-i="${i}">🎙️ ${has ? '重錄' : '錄音'}</button>
+      ${has ? '<button class="pbtn del">↺ 用內建</button>' : ''}`;
+    const [playBtn, recBtn] = row.querySelectorAll('.pbtn');
+    playBtn.onclick = () => { stopSpeech(); chainId++; playPetLine(i); };
+    recBtn.onclick = () => toggleRecord(recBtn, (dataUrl) => {
+      (Custom.data.petLines = Custom.data.petLines || {})[i] = dataUrl;
+      Custom.save();
+      AudioEngine.playSfx('ding');
+      renderPetEditor();
+    });
+    const del = row.querySelector('.pbtn.del');
+    if (del) del.onclick = () => {
+      delete Custom.data.petLines[i];
+      Custom.save();
+      AudioEngine.playSfx('pop');
+      renderPetEditor();
+    };
+    list.appendChild(row);
+  });
+}
+
 /* ---- 組隊：上方三個固定出戰位置 + 下方滑動英雄列 ---- */
 let slotSel = 0;                       // 目前選中的出戰位置（點英雄會放進這格）
 function heroName(i) { return heroTheme().words[i] ? heroTheme().words[i].zh : '?'; }
@@ -1054,6 +1106,7 @@ function renderPetEditor() {
     };
     box.appendChild(sec);
   });
+  renderPetLineRecorder(box);
   const add = document.createElement('button');
   add.className = 'small-btn';
   add.textContent = '➕ 新增自建寵物';

@@ -931,7 +931,7 @@ async function toggleRecord(btn, onDone) {
     rec.onstop = () => {
       stream.getTracks().forEach(t => t.stop());
       btn.classList.remove('recording');
-      btn.textContent = btn.dataset.k === 'w' ? '🎙️ 錄單字 ✓' : '🎙️ 錄例句 ✓';
+      btn.textContent = (btn._label || '🎙️ 錄音') + ' ✓';
       activeRecorder = null;
       const blob = new Blob(chunks, { type: rec.mimeType });
       const fr = new FileReader();
@@ -939,6 +939,7 @@ async function toggleRecord(btn, onDone) {
       fr.readAsDataURL(blob);
     };
     activeRecorder = rec;
+    btn._label = btn.textContent;      // 記住原本的按鈕文字，停止時還原
     btn.classList.add('recording');
     btn.textContent = '⏹ 停止';
     rec.start();
