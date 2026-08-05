@@ -232,11 +232,11 @@ HEROES.append(wrap(
 
 # 20 Loki 洛基：綠衣金飾、金色雙角頭盔、黑髮、狡黠微笑
 HEROES.append(wrap(
-    f'<path d="M112 96 Q70 56 78 12 Q112 48 132 84 Z" fill="#f2a900" {S}/>' +
-    f'<path d="M208 96 Q250 56 242 12 Q208 48 188 84 Z" fill="#f2a900" {S}/>' +
+    f'<path d="M108 100 Q54 62 64 4 Q108 42 132 86 Z" fill="#f2a900" {S}/>' +
+    f'<path d="M212 100 Q266 62 256 4 Q212 42 188 86 Z" fill="#f2a900" {S}/>' +
     head('#f6c99f') +
     f'<path d="M62 176 Q58 84 160 78 Q262 84 258 176 Q244 118 160 114 Q76 118 62 176 Z" fill="#20232a" {S}/>' +
-    f'<path d="M84 136 Q160 102 236 136 L232 158 Q160 124 88 158 Z" fill="#f2a900" {S}/>' +
+    f'<path d="M82 150 Q160 118 238 150 L234 176 Q160 142 86 176 Z" fill="#f2a900" {S}/>' +
     f'<circle cx="128" cy="184" r="9" fill="#1a1a1a"/><circle cx="192" cy="184" r="9" fill="#1a1a1a"/>' +
     f'<path d="M130 228 Q160 246 192 220" fill="none" {S}/>' +
     f'<path d="M70 268 Q160 240 250 268 L250 312 Q160 284 70 312 Z" fill="#2a7d4f" {Sthin}/>' +
@@ -244,8 +244,6 @@ HEROES.append(wrap(
 ))
 # 21 Vision 幻視：紅臉、額頭黃寶石、金色頭飾、綠披肩
 HEROES.append(wrap(
-    f'<path d="M52 250 L96 200 L120 268 Z" fill="#2a7d4f" {S}/>' +
-    f'<path d="M268 250 L224 200 L200 268 Z" fill="#2a7d4f" {S}/>' +
     head('#c8102e') +
     f'<path d="M70 140 Q78 76 160 72 Q242 76 250 140 Q232 104 160 100 Q88 104 70 140 Z" fill="#f2a900" {S}/>' +
     f'<path d="M64 172 L98 148 L98 196 Z" fill="#f2a900" {Sthin}/>' +
@@ -254,13 +252,17 @@ HEROES.append(wrap(
     f'<circle cx="160" cy="134" r="21" fill="#ffd60a" {Sthin}/>' +
     f'<circle cx="160" cy="134" r="9" fill="#fff8c4"/>' +
     f'<circle cx="128" cy="190" r="10" fill="#fff"/><circle cx="192" cy="190" r="10" fill="#fff"/>' +
-    f'<path d="M132 234 Q160 248 188 234" fill="none" {S}/>'
+    f'<path d="M132 234 Q160 248 188 234" fill="none" {S}/>' +
+    f'<path d="M44 306 L96 254 L124 320 Z" fill="#2a7d4f" {S}/>' +
+    f'<path d="M276 306 L224 254 L196 320 Z" fill="#2a7d4f" {S}/>' +
+    f'<path d="M96 266 Q160 246 224 266 L224 320 L96 320 Z" fill="#2a7d4f" {Sthin}/>'
 ))
 # 22 Scarlet Witch 緋紅女巫：紅衣、深紅長髮、紅色頭飾、紅色魔法光暈
 HEROES.append(wrap(
     f'<path d="M62 206 Q46 96 160 66 Q274 96 258 206 Q264 258 240 284 Q246 214 238 172 L82 172 Q74 214 80 284 Q56 258 62 206 Z" fill="#7a1220" {S}/>' +
     f'<circle cx="160" cy="180" r="80" fill="#f6c99f" {S}/>' +
-    f'<path d="M96 132 L120 96 L140 126 L160 88 L180 126 L200 96 L224 132 Q160 108 96 132 Z" fill="#c8102e" {Sthin}/>' +
+    f'<path d="M96 134 L120 92 L140 124 L160 84 L180 124 L200 92 L224 134 Q160 110 96 134 Z" fill="#e63946" {S}/>' +
+    f'<path d="M92 138 Q160 108 228 138 L224 162 Q160 130 96 162 Z" fill="#c8102e" {S}/>' +
     f'<circle cx="132" cy="182" r="9" fill="#1a1a1a"/><circle cx="188" cy="182" r="9" fill="#1a1a1a"/>' +
     f'<path d="M134 224 Q160 240 186 224" fill="none" {S}/>' +
     f'<circle cx="48" cy="268" r="24" fill="#e63946" opacity="0.85" {Sthin}/>' +
@@ -270,8 +272,8 @@ HEROES.append(wrap(
 ))
 # 23 Falcon 獵鷹：紅白配色、護目鏡、灰白機械翅膀
 HEROES.append(wrap(
-    f'<path d="M104 108 Q46 100 22 156 Q56 138 96 148 Q46 168 30 216 Q70 180 108 186 Z" fill="#e9ecef" {S}/>' +
-    f'<path d="M216 108 Q274 100 298 156 Q264 138 224 148 Q274 168 290 216 Q250 180 212 186 Z" fill="#e9ecef" {S}/>' +
+    f'<path d="M114 106 L18 88 L44 128 L10 140 L46 174 L14 194 L110 186 Z" fill="#e9ecef" {S}/>' +
+    f'<path d="M206 106 L302 88 L276 128 L310 140 L274 174 L306 194 L210 186 Z" fill="#e9ecef" {S}/>' +
     head('#c8102e') +
     f'<path d="M64 158 Q64 86 160 82 Q256 86 256 158 Q220 118 160 118 Q100 118 64 158 Z" fill="#e9ecef" {S}/>' +
     f'<path d="M74 154 Q160 132 246 154 L246 190 Q160 168 74 190 Z" fill="#20232a" {S}/>' +
@@ -318,11 +320,11 @@ HEROES.append(wrap(
 HEROES.append(wrap(
     f'<path d="M60 202 Q46 84 160 58 Q274 84 260 202 Q252 252 226 272 Q240 196 232 154 L88 154 Q80 196 94 272 Q68 252 60 202 Z" fill="#1f6b3a" {S}/>' +
     f'<circle cx="160" cy="182" r="72" fill="#f6c99f" {S}/>' +
-    f'<path d="M92 164 Q160 144 228 164 L226 192 Q160 172 94 192 Z" fill="#2a9d3f" {S}/>' +
+    f'<path d="M92 164 Q160 144 228 164 L226 192 Q160 172 94 192 Z" fill="#4cc26a" {S}/>' +
     f'<circle cx="128" cy="174" r="9" fill="#fff"/><circle cx="192" cy="174" r="9" fill="#fff"/>' +
     f'<path d="M130 212 Q146 204 160 210 Q174 204 190 212 Q184 244 160 248 Q136 244 130 212 Z" fill="#f2c14e" {Sthin}/>' +
-    f'<path d="M254 200 Q294 250 254 300" fill="none" stroke="#2a9d3f" stroke-width="9" stroke-linecap="round"/>' +
-    f'<line x1="256" y1="202" x2="256" y2="298" stroke="#e9ecef" stroke-width="5"/>'
+    f'<path d="M252 178 Q302 240 252 302" fill="none" stroke="#2a9d3f" stroke-width="12" stroke-linecap="round"/>' +
+    f'<line x1="254" y1="180" x2="254" y2="300" stroke="#8d5524" stroke-width="6"/>'
 ))
 # 28 Shazam 沙贊：紅衣白披風、胸前金色閃電、黑髮
 HEROES.append(wrap(
