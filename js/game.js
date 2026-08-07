@@ -294,6 +294,7 @@ document.querySelectorAll('.nav-btn').forEach(b => {
   b.onclick = () => {
     AudioEngine.playSfx('ding');
     const go = b.dataset.go;
+    document.querySelectorAll('.level-bar').forEach(renderLevelBar);
     if (go === 'learn') { showScreen('learn'); renderLearnMenu(); }
     else if (go === 'adventure') { showScreen('menu'); renderThemeMenu(); }
     else if (go === 'dex') { showScreen('dex'); renderDex(); }
@@ -365,8 +366,60 @@ function renderLearnMenu() {
 }
 
 /* ================= 學習：20 步課程 ================= */
+/* ================= 難度（學習與冒險共用） =================
+   1 純單字：完全不出現句子
+   2 簡單填空：句子挖掉目標字，用選圖補回來
+   3 完整句子：聽完整例句並跟讀（原本的行為）
+   4 混合：三種隨機
+   ------------------------------------------------------- */
+const LEVELS = [
+  { id: 1, icon: '🔤', name: '純單字', tip: '只練單字，完全不出現句子' },
+  { id: 2, icon: '🧩', name: '簡單填空', tip: '句子留一個空格，選出正確的圖' },
+  { id: 3, icon: '📖', name: '完整句子', tip: '聽完整例句並跟著唸' },
+  { id: 4, icon: '🎲', name: '混合', tip: '三種難度隨機出現' },
+];
+let curLevel = Math.min(4, Math.max(1, Number(localStorage.getItem('abc-level') || 1)));
+function setLevel(n) {
+  curLevel = n;
+  localStorage.setItem('abc-level', n);
+  document.querySelectorAll('.level-bar').forEach(renderLevelBar);
+}
+function renderLevelBar(bar) {
+  const lv = LEVELS.find(l => l.id === curLevel);
+  bar.innerHTML = '';
+  LEVELS.forEach(l => {
+    const b = document.createElement('button');
+    b.className = 'level-btn' + (l.id === curLevel ? ' on' : '');
+    b.textContent = `${l.icon} ${l.name}`;
+    b.onclick = () => { AudioEngine.playSfx('pop'); setLevel(l.id); };
+    bar.appendChild(b);
+  });
+  const hint = document.createElement('div');
+  hint.className = 'level-hint';
+  hint.textContent = lv.tip;
+  bar.appendChild(hint);
+}
+// 把例句中的目標單字挖成空格
+function blankSen(w) {
+  if (!w.sen) return '';
+  const esc = w.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  for (const re of [new RegExp('\\b' + esc + '\\b', 'i'), new RegExp('\\b' + esc + 's\\b', 'i'),
+                    new RegExp(esc, 'i')]) {
+    if (re.test(w.sen)) return w.sen.replace(re, '<span class="blank">＿＿＿</span>');
+  }
+  return w.sen;   // 找不到就照原句顯示
+}
+// 第三階段（應用）依難度決定形式；沒有例句的字一律退回 recall
+function stage2Kind(w) {
+  const pool = curLevel === 4 ? ['recall', 'cloze', 'sentence']
+    : [null, 'recall', 'cloze', 'sentence'][curLevel];
+  const kind = Array.isArray(pool) ? pool[Math.floor(Math.random() * pool.length)] : pool;
+  return (kind !== 'recall' && !w.sen) ? 'recall' : kind;
+}
 const STAGE_NAMES = ['📖 學習', '🎤 練習', '📚 應用', '🎤 複習'];
-const STAGE_TIPS = ['聽一次英文和中文', '看圖大聲唸英文！', '聽聽完整的例句', '再唸一次，你一定行！'];
+const STAGE_TIPS = ['聽一次英文和中文', '看圖大聲唸英文！', '', '再唸一次，你一定行！'];
+const KIND_TIPS = { recall: '想想看這是什麼英文？', cloze: '聽句子，選出空格的圖片',
+                    sentence: '聽聽完整的例句' };
 let lesson = null, lessonToken = 0;
 
 function startLesson(theme, group) {
@@ -376,7 +429,9 @@ function startLesson(theme, group) {
   const tasks = [];
   while (remaining.length) {
     const k = Math.floor(Math.random() * remaining.length);
-    tasks.push({ ref: remaining[k].ref, stage: remaining[k].next });
+    const stage = remaining[k].next;
+    tasks.push({ ref: remaining[k].ref, stage,
+                 kind: stage === 2 ? stage2Kind(remaining[k].ref.w) : null });
     if (++remaining[k].next >= 4) remaining.splice(k, 1);
   }
   lesson = { tasks, idx: 0, key: theme.id + '_g' + group.no, refs: group.refs };
@@ -394,16 +449,32 @@ function renderTask() {
   const token = ++lessonToken;
   abortRecognize();      // 換題時作廢還在路上的辨識結果
   stopSpeech();
-  const { ref, stage } = lesson.tasks[lesson.idx];
+  const { ref, stage, kind } = lesson.tasks[lesson.idx];
   const w = ref.w;
   $('lessonBar').style.setProperty('--p', (lesson.idx / lesson.tasks.length * 100) + '%');
   $('lessonStep').textContent = (lesson.idx + 1) + ' / ' + lesson.tasks.length;
-  $('lessonStage').textContent = STAGE_NAMES[stage] + '：' + STAGE_TIPS[stage];
-  $('lessonCard').innerHTML = `
-    ${visualHTML(ref.t, ref.i)}
-    <div class="l-en">${w.en}</div>
-    <div class="l-zh">${w.zh}</div>
-    ${stage === 2 && w.sen ? `<div class="l-sen">${w.sen}<br>${w.szh || ''}</div>` : ''}`;
+  $('lessonStage').textContent = STAGE_NAMES[stage] +
+    '：' + (stage === 2 ? KIND_TIPS[kind] : STAGE_TIPS[stage]);
+  if (stage === 2 && kind === 'recall') {
+    // 純單字：先蓋住英文讓小朋友回想，按「看答案」才揭曉
+    $('lessonCard').innerHTML = `
+      ${visualHTML(ref.t, ref.i)}
+      <div class="l-hidden">？？？</div>
+      <div class="l-zh">${w.zh}</div>`;
+  } else if (stage === 2 && kind === 'cloze') {
+    // 簡單填空：只給挖空的句子，圖片是答案所以先不顯示
+    $('lessonCard').innerHTML = `
+      <div class="cloze-sen">${blankSen(w)}</div>
+      <div class="l-zh">${w.szh || ''}</div>
+      <div class="cloze-choices"></div>`;
+  } else {
+    $('lessonCard').innerHTML = `
+      ${visualHTML(ref.t, ref.i)}
+      <div class="l-en">${w.en}</div>
+      <div class="l-zh">${w.zh}</div>
+      ${stage === 2 && kind === 'sentence' && w.sen
+        ? `<div class="l-sen">${w.sen}<br>${w.szh || ''}</div>` : ''}`;
+  }
   const ctl = $('lessonControls');
   ctl.innerHTML = '';
   const addBtn = (label, cls, fn) => {
@@ -421,13 +492,32 @@ function renderTask() {
       playWordAudio(ref.t, ref.i, () => {
         if (token === lessonToken) playZhWord(ref, null);
       });
-    } else if (stage === 2 && w.sen) {
+    } else if (stage === 2 && (kind === 'sentence' || kind === 'cloze') && w.sen) {
       playSentenceAudio(ref.t, ref.i, null);
+    } else if (stage === 2 && kind === 'recall') {
+      return;                       // 回想階段先不給答案
     } else {
       playWordAudio(ref.t, ref.i, null);
     }
   };
-  if (stage === 0 || stage === 2) {
+  if (stage === 2 && kind === 'recall') {
+    let revealed = false;
+    const reveal = addBtn('👀 看答案', 'pink', () => {
+      if (revealed) return;
+      revealed = true;
+      $('lessonCard').querySelector('.l-hidden').outerHTML =
+        `<div class="l-en">${w.en}</div>`;
+      reveal.textContent = '🔊 再聽一次';
+      stopSpeech(); chainId++;
+      playWordAudio(ref.t, ref.i, () => { if (token === lessonToken) playZhWord(ref, null); });
+    });
+    addBtn('下一步 ▶', '', () => lessonNext());
+  } else if (stage === 2 && kind === 'cloze') {
+    renderClozeChoices(ref, token);
+    addBtn('🔊 再聽一次', '', playPrompt);
+    setTimeout(playPrompt, 350);
+    return;                          // 選對圖片才會前進
+  } else if (stage === 0 || stage === 2) {
     addBtn('🔊 再聽一次', '', playPrompt);
     addBtn('下一步 ▶', 'pink', () => lessonNext());
   } else {
@@ -444,6 +534,35 @@ function renderTask() {
     addBtn('🔊 聽一次', '', () => { stopSpeech(); chainId++; playWordAudio(ref.t, ref.i, null); });
   }
   setTimeout(playPrompt, 350);
+}
+// 填空題：從同組單字取 3 個選項，選對才前進
+function renderClozeChoices(ref, token) {
+  const box = $('lessonCard').querySelector('.cloze-choices');
+  if (!box) return;
+  const others = shuffled(lesson.refs.filter(r => r !== ref)).slice(0, 2);
+  let locked = false;
+  shuffled([ref, ...others]).forEach(r => {
+    const d = document.createElement('div');
+    d.className = 'choice cloze-pick';
+    d.innerHTML = visualHTML(r.t, r.i);
+    d.onclick = () => {
+      if (locked || token !== lessonToken) return;
+      if (r === ref) {
+        locked = true;
+        d.classList.add('correct');
+        AudioEngine.playSfx('yay');
+        playPraise(null);
+        celebrate();
+        setTimeout(() => { if (token === lessonToken) lessonNext(); }, 1200);
+      } else {
+        d.classList.add('wrong');
+        AudioEngine.playSfx('wrong');
+        playTryAgain();
+        setTimeout(() => d.classList.remove('wrong'), 600);
+      }
+    };
+    box.appendChild(d);
+  });
 }
 function playZhWord(ref, cb) {
   const src = ref.w._custom ? null : `assets/voice/${ref.t.id}_${ref.i}_z.mp3`;
@@ -546,13 +665,19 @@ function nextBattleRound() {
   const quiz = pickQuizPool(poolFor(currentTheme), battleAsked);
   battle.answer = quiz.answer;
   battleAsked.add(Mem.key(battle.answer.t, battle.answer.i));
-  const r = Math.random();
-  battle.qtype = r < 0.5 ? 'pick' : r < 0.75 ? 'speak' : 'sentence';
+  // 題型依難度決定：1 純單字 / 2 加填空 / 3 加完整句子 / 4 全部
+  const TYPES = { 1: ['pick', 'pick', 'speak'], 2: ['pick', 'speak', 'cloze'],
+                  3: ['pick', 'speak', 'sentence'], 4: ['pick', 'speak', 'cloze', 'sentence'] };
+  const pool = TYPES[curLevel] || TYPES[1];
+  battle.qtype = pool[Math.floor(Math.random() * pool.length)];
   const w = battle.answer.w;
-  if (battle.qtype === 'sentence' && !w.sen) battle.qtype = 'speak';
+  if ((battle.qtype === 'sentence' || battle.qtype === 'cloze') && !w.sen) battle.qtype = 'speak';
 
-  if (battle.qtype === 'pick') {
-    $('battleAsk').textContent = '👂 聽聲音，點出正確的圖片！';
+  if (battle.qtype === 'pick' || battle.qtype === 'cloze') {
+    const isCloze = battle.qtype === 'cloze';
+    $('battleAsk').textContent = isCloze ? '🧩 聽句子，選出空格裡的圖片！'
+                                         : '👂 聽聲音，點出正確的圖片！';
+    if (isCloze) $('battleBig').innerHTML = `<div class="cloze-sen">${blankSen(w)}</div>`;
     const grid = $('battleChoices');
     quiz.choices.forEach(ref => {
       const d = document.createElement('div');
@@ -565,7 +690,11 @@ function nextBattleRound() {
       };
       grid.appendChild(d);
     });
-    setTimeout(() => { stopSpeech(); chainId++; playWordAudio(battle.answer.t, battle.answer.i, null); }, 450);
+    setTimeout(() => {
+      stopSpeech(); chainId++;
+      if (isCloze) playSentenceAudio(battle.answer.t, battle.answer.i, null);
+      else playWordAudio(battle.answer.t, battle.answer.i, null);
+    }, 450);
   } else {
     const isSen = battle.qtype === 'sentence';
     $('battleAsk').textContent = isSen ? '📢 跟著唸一次英文句子，就能攻擊怪獸！'
@@ -604,6 +733,7 @@ $('battleSpeaker').onclick = () => {
   if (!battle.answer) return;
   stopSpeech(); chainId++;
   if (battle.qtype === 'sentence') speakEn(battle.answer.w.sen);
+  else if (battle.qtype === 'cloze') playSentenceAudio(battle.answer.t, battle.answer.i, null);
   else playWordAudio(battle.answer.t, battle.answer.i, null);
 };
 function battleWrong(el) {

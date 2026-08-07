@@ -318,6 +318,22 @@ h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); color: #ff6b6b;
 
 /* ===== 學習選單 ===== */
 #learnThemes { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+/* 難度選擇列 */
+.level-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  width: 100%; margin-bottom: 6px; }
+.level-btn { font-family: inherit; font-size: 1rem; padding: 8px 14px; border-radius: 999px;
+  border: 3px solid #ddd; background: #fff; cursor: pointer; color: #555; }
+.level-btn.on { border-color: #ff6b9d; background: #fff2f7; color: #c2185b; font-weight: bold; }
+.level-hint { width: 100%; text-align: center; color: #888; font-size: .9rem; margin-bottom: 10px; }
+/* 填空句子 */
+.cloze-sen { font-size: 1.35rem; color: #333; font-weight: bold; margin: 6px 0 12px;
+  line-height: 1.5; }
+.cloze-sen .blank { color: #ff6b9d; letter-spacing: 2px; }
+.l-hidden { font-size: 2rem; color: #ccc; letter-spacing: 4px; }
+.cloze-choices { display: flex; gap: 12px; justify-content: center; margin-top: 10px; }
+.cloze-choices .cloze-pick { padding: 10px; }
+.cloze-choices .cloze-pick .pic img { width: 84px; height: 84px; }
+
 /* 主題分區標題（把國小 300 單字跟自訂主題分開） */
 .theme-section { width: 100%; text-align: center; font-weight: bold; color: #845ec2;
   font-size: 1.05rem; margin: 10px 0 2px; }
