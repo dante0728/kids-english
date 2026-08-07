@@ -409,7 +409,15 @@ $('bgmBtn').onclick = () => {
 function renderThemeMenu() {
   const grid = $('themeGrid');
   grid.innerHTML = '';
+  let curriculumLabelDone = false;
   allThemes().concat([MIX_THEME]).forEach(t => {
+    if (!curriculumLabelDone && t.id.startsWith('n_')) {
+      curriculumLabelDone = true;
+      const lab = document.createElement('div');
+      lab.className = 'theme-section grid-wide';
+      lab.textContent = '📕 國小必學 300 單字';
+      grid.appendChild(lab);
+    }
     const count = poolFor(t).length;
     const c = document.createElement('div');
     c.className = 'menu-card' + (t.id === 'mix' ? ' mix' : '');

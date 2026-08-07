@@ -328,7 +328,16 @@ function renderLearnMenu() {
   if (!learnTheme || !themes.find(t => t.id === learnTheme.id)) learnTheme = themes[0];
   const chips = $('learnThemes');
   chips.innerHTML = '';
+  let curriculumLabelDone = false;
   themes.forEach(t => {
+    // 國小必學 300 單字自成一區，跟自訂主題分開比較好找
+    if (!curriculumLabelDone && t.id.startsWith('n_')) {
+      curriculumLabelDone = true;
+      const lab = document.createElement('div');
+      lab.className = 'theme-section';
+      lab.textContent = '📕 國小必學 300 單字';
+      chips.appendChild(lab);
+    }
     const b = document.createElement('button');
     b.className = 'ptheme-chip' + (t.id === learnTheme.id ? ' on' : '');
     b.textContent = `${t.emoji} ${t.name}`;
