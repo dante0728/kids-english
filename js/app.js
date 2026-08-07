@@ -131,21 +131,50 @@ const speakZh = (t, cb) => ttsSpeak(t, zhVoice, 'zh-TW', cb);
 function stopSpeech() {
   chainId++;
   if ('speechSynthesis' in window) speechSynthesis.cancel();
-  Object.values(audioCache).forEach(a => { a.pause(); });
+  if (sharedAudio) { sharedAudio.onended = sharedAudio.onerror = null; sharedAudio.pause(); }
   AudioEngine.duck(false);
   hideSentence();
 }
 
 /* ================= 預合成音檔播放 ================= */
-const audioCache = {};
-function playFile(path, onend, onfail) {
-  let a = audioCache[path];
-  if (!a) { a = new Audio(path); a.preload = 'auto'; audioCache[path] = a; }
-  a.onended = () => { AudioEngine.duck(false); onend && onend(); };
-  AudioEngine.duck(true);
-  a.currentTime = 0;
+/* iPad/iOS 只允許「使用者手勢中啟動過」的音訊元件之後再程式化播放。
+   若每個音檔各自 new Audio()，在 onended 回呼裡建立的新元件會被靜默擋下
+   （例如唸完英文要接著唸中文時），因此改用單一共用元件、開場手勢時解鎖。*/
+let sharedAudio = null;
+function getAudioEl() {
+  if (!sharedAudio) {
+    sharedAudio = new Audio();
+    sharedAudio.preload = 'auto';
+  }
+  return sharedAudio;
+}
+function unlockAudioEl() {
+  const a = getAudioEl();
+  // 播一段極短的無聲音訊，把元件解鎖給後續程式化播放使用
+  a.src = 'data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA'
+        + 'gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID/////////////////////'
+        + '//////////////8AAAA5TEFNRTMuMTAwAc0AAAAAAAAAABSAJAJAQgAAgAAAAnGMHkkIAAAA';
   const p = a.play();
-  if (p && p.catch) p.catch(() => { AudioEngine.duck(false); onfail && onfail(); });
+  if (p && p.catch) p.catch(() => {});
+}
+function playFile(path, onend, onfail) {
+  const a = getAudioEl();
+  let settled = false;
+  const finish = (ok) => {
+    if (settled) return;
+    settled = true;
+    a.onended = a.onerror = null;
+    AudioEngine.duck(false);
+    if (ok) { if (onend) onend(); }
+    else if (onfail) onfail();
+  };
+  a.onended = () => finish(true);
+  a.onerror = () => finish(false);      // 檔案缺失或載入失敗 → 走備援（不再卡住）
+  AudioEngine.duck(true);
+  a.src = path;
+  try { a.currentTime = 0; } catch (e) {}
+  const p = a.play();
+  if (p && p.catch) p.catch(() => finish(false));
 }
 function playWordAudio(theme, i, cb) {
   const id = chainId;
@@ -1134,6 +1163,15 @@ $('cloudOffBtn').onclick = () => {
 function firstTouch() {
   AudioEngine.unlock();
   pickVoices();
+  unlockAudioEl();          // 解鎖共用音訊元件（之後才能在回呼中連續播放）
+  // 同時解鎖語音合成：iOS 也要求首次發話發生在使用者手勢中
+  if ('speechSynthesis' in window) {
+    try {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
   document.removeEventListener('pointerdown', firstTouch);
 }
 document.addEventListener('pointerdown', firstTouch);
