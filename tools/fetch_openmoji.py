@@ -16,12 +16,16 @@ os.makedirs(TMP, exist_ok=True)
 RAW = 'https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/618x618/'
 
 def candidates(emoji):
+    """OpenMoji 檔名的碼位要補零到至少 4 位（例如鍵帽 0️⃣ 是 0030-FE0F-20E3）。
+    不補零的寫法會讓數字鍵帽等低碼位 emoji 靜默抓不到，故兩種格式都試。"""
     cps = [ord(c) for c in emoji]
-    full = '-'.join(f'{c:X}' for c in cps)
-    nofe = '-'.join(f'{c:X}' for c in cps if c != 0xFE0F)
-    out = [full]
-    if nofe != full:
-        out.append(nofe)
+    out = []
+    for fmt in ('04X', 'X'):
+        full = '-'.join(format(c, fmt) for c in cps)
+        nofe = '-'.join(format(c, fmt) for c in cps if c != 0xFE0F)
+        for cand in (full, nofe):
+            if cand not in out:
+                out.append(cand)
     return out
 
 def fetch(url, path):

@@ -9,7 +9,7 @@
 輸出：assets/img/{themeId}_{i}.png
 用法：python tools/fetch_img_300.py
 """
-import json, os, subprocess, time
+import json, os, shutil, subprocess, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'assets', 'img')
@@ -77,8 +77,8 @@ def main():
     print(f'--- openmoji300 ok={ok}/{total} fail={len(fail)}')
     for x in fail:
         print('  fail', x)
-    with open(os.path.join(TMP, 'fail.json'), 'w', encoding='utf-8') as f:
-        json.dump(fail, f, ensure_ascii=False, indent=1)
+    # 清掉暫存的 618px 原圖，避免留在 assets/ 被部署
+    shutil.rmtree(TMP, ignore_errors=True)
 
 
 if __name__ == '__main__':
